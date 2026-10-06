@@ -1,47 +1,123 @@
-# Методология (финальная версия)
-
-Краткое описание решения. Результаты, проверки и ограничения: `FINAL_REPORT.md`; точные числа с источниками: `PRESENTATION_DATA.md`.
+# Методология — финальная версия
 
 ## 1. Задача
 
-Прогноз месячных безналичных потребительских расходов (₽) 2 016 муниципальных образований на 1–3 месяца вперёд и обнаружение структурных сдвигов. История: 24 месяца (2023-01…2024-12).
+Прогноз месячных безналичных потребительских расходов 2 016 муниципальных образований и анализ структурных сдвигов. Основной contest-style benchmark: origins 2024-06…09, h=1–3, 24 192 пары. Отдельно проверены горизонты 1/3/6/12.
 
-## 2. Данные
+## 2. Данные и идентичность рядов
 
-- Муниципальный экспорт без стабильного id: ряд это непрерывный блок строк (МО, категория) сырого файла, внутри отсортированный по месяцу. 49 названий принадлежат нескольким МО; среди полных рядов 107 омонимов под 43 названиями. 174 неполных ряда исключены (конкурсный протокол).
-- Категорийные ряды связываются с итоговыми по имени для 1 909 МО.
-- Национальные месячные ряды СберИндекса и недельные YoY по 12 категориям; используются только значения, датированные не позже origin (недели по воскресенью, которым они заканчиваются).
-- В муниципальной медиане есть аномалия I квартала: февраль–март 2023 на 9.6–10.0% выше, январь 2024 на 7.7% ниже относительно национального ряда (`outputs/common_level_gap.csv`).
+Муниципальный экспорт покрывает 2023-01…2024-12 и не содержит стабильного id. Ряд восстанавливается как непрерывный raw-block (МО, категория) с возрастающим месяцем. Полных рядов: 2 016; среди них 107 омонимов под 43 названиями. run_id выгрузки используется как технический ключ.
 
-## 3. Прогноз
+Внешние данные:
+- национальные месячные расходы / nominal & real YoY / SA-index;
+- национальные недельные категории;
+- исторический news/event corpus по заранее зафиксированному query plan.
 
-Обозначения: f_t = медиана log-расходов по МО, d = log y − f.
+Все exogenous features выравниваются по времени и доступны только если их дата ≤ forecast origin.
 
-1. local_sng2: log ŷ(T+h) = log y(T+h−12) + средний собственный YoY за 2 последних месяца.
-2. panel factor: log ŷ(T+h) = d(T) + f(T+h−12) + средний YoY фактора за 6 месяцев.
-3. V2 = 0.5·local + 0.5·panel (в рублях).
-4. **V3 (benchmark model)** = V2 + error feedback: к лог-прогнозу добавляется b₁·e(T) + b₂·e(T−1), e это ошибка прогноза на месяц вперёд за вычетом медианы по МО, известная на T; b оцениваются МНК по прошлым парам с target ≤ T.
-5. **V3-hedge (production model)**: как V3, но общий рост панельной компоненты равен среднему трёх оценок (муниципальная медиана за 6 и за 2 месяца, национальный ряд за 2 месяца), без подбора весов.
+## 3. Forecasting
 
-Обе модели заморожены в `src/sbx/final.py`.
+Пусть f_t — медиана log-расходов по МО, d_it = log y_it − f_t.
 
-## 4. Интервалы
+- local_sng2: тот же месяц год назад × собственный средний YoY последних двух месяцев.
+- panel factor: текущая позиция МО относительно медианы + общий path панели.
+- V2: 50/50 смесь local и panel в рублях.
+- V3: V2 + error feedback по двум последним известным idiosyncratic one-step errors. Коэффициенты оцениваются только на прошлых forecast pairs с уже наблюдаемыми target.
+- V3-hedge: тот же error feedback, но общий рост panel-part = среднее municipal 6m, municipal 2m и national 2m YoY.
 
-Двухчастный split-conformal: квантиль центрированных идиосинкратических ошибок, нормированных на робастный масштаб ряда, плюс полоса на общий шок месяца (1.4826·медиана |общая ошибка|); калибровка только по парам с target ≤ T за последние 4 месяца.
+V3 — benchmark model. V3-hedge — robust/production alternative.
 
-## 5. Структурные сдвиги
+## 4. Горизонты 1 / 3 / 6 / 12
 
-Событие в месяце t: |медиана d за t…t+2 − медиана d за t−3…t−1| ≥ 3 робастных σ ряда; все три точки после по одну сторону не ближе половины сдвига; нет сдвига того же знака не меньше половины на t±12 (сезонное эхо); локальный максимум в ±2 месяца. Метки всегда считаются по данным, усечённым на дату обучения.
+Отдельный benchmark использует одинаковые пары внутри каждого горизонта.
 
-Детекция: строка (i, t) положительна, если сдвиг начался в [t−2, t]. Упреждение: если начнётся в [t+1, t+3]. Задачи оцениваются раздельно, rolling: модель переобучается каждый месяц, эмбарго 2 и 5 месяцев. Детекторы: robust jump, CUSUM, Page-Hinkley, BOCPD, PELT; supervised LightGBM на признаках итогового ряда (с ablation категориальных, национальных и недельных признаков).
+- h=1: 10 origins
+- h=3: 8 origins
+- h=6: 5 origins
+- h=12: V3/V3-hedge не определены на исторических origins с наблюдаемым target, потому что им нужен observable municipal YoY на origin. Для h=12 сравниваются только модели, математически определимые на 2023 origins.
 
-## 6. Оценка
+Ограничение h=12 является следствием длины данных, а не пропущенным экспериментом.
 
-- Exact-окно: origins 2024-06…09, h = 1–3, 24 192 пары. Дополнительно origins 2024-02…05, 10, 11.
-- Репликация замороженных моделей на 5 категориальных панелях, не использованных ни в одном решении.
-- Парные сравнения: sign test по целевым месяцам (основной), bootstrap по рядам и месяцам.
-- Тест на утечку: все данные после origin заменяются мусором, прогнозы не должны меняться.
+## 5. Foundation model
 
-## 7. Legacy
+Запущена TimesFM 2.5-200M zero-shot с frozen official Google weights.
 
-`src/pipeline.py` (pooled LightGBM для h = 1/3/6/12 на 1 904 рядах без омонимов и operational early warning) сохранён для преемственности. Его метрики не сопоставимы с exact-протоколом, финальные модели его не используют. Исходная версия этого документа заявляла для early warning PR-AUC 0.525 / F1 0.575; эти значения получены на сезонных метках с порогом, подобранным на валидации, и недействительны (на честной разметке тот же классификатор даёт PR-AUC 0.024, `outputs/shock_metrics.json`).
+Два заранее заданных варианта:
+- raw levels;
+- log YoY context.
+
+Fine-tuning и tuning под exact не использовались. Point forecast TimesFM хуже V3/V3-hedge на h=1/3/6, но её 80% interval на h=1 ближе к nominal coverage.
+
+## 6. Prediction intervals
+
+Двухчастный time-safe conformal:
+- idiosyncratic normalized residual;
+- отдельный band общего monthly shock.
+
+Calibration использует только forecast errors, уже наблюдаемые на текущий origin.
+
+## 7. Structural shifts
+
+Операционное событие:
+- panel-relative level shift ≥3 robust sigma;
+- post-level устойчив 3 месяца;
+- исключается 12-месячное seasonal echo;
+- deduplication local maxima ±2 месяца.
+
+Две разные задачи:
+- detection: shift начался 0–2 месяца назад;
+- prediction: shift начнётся через 1–3 месяца.
+
+Сравниваются robust jump, BOCPD, PELT, CUSUM, Page-Hinkley и supervised LightGBM. Rolling retraining и embargo исключают использование незрелых labels.
+
+## 8. News / event signals
+
+Query plan из 95 month×topic запросов зафиксирован до полного сбора. Корпус: 550 search results за 2023-05…2024-11.
+
+Temporal guard:
+- candidate publication dates берутся из metadata и URL;
+- verified publication date = наиболее поздняя достоверная candidate;
+- query-month mismatches и записи без надёжной даты исключаются;
+- rolling sums используют только текущий и прошлые месяцы.
+
+Frozen ablation:
+- forecasting: V3 vs V3 + news residual correction;
+- early warning: base vs base + news.
+
+Новости не улучшают финальную систему и поэтому не входят в production forecast.
+
+## 9. Проверки качества
+
+- exact / other / apr–nov rolling windows;
+- 5 untouched category panels;
+- horizon benchmark 1/3/6/12;
+- TimesFM / Prophet / simple baselines;
+- ablation;
+- sign test по target months;
+- time-safety perturbation tests;
+- separate news time-safety tests;
+- deterministic real examples including failure case.
+
+## 10. Финальные headline metrics
+
+Exact:
+- V3 MAE 719.87 ₽
+- R² growth 0.4376
+- wMAPE 2.284%
+
+Structural-shift detection:
+- PR-AUC 0.383
+- base rate 1.82%
+- 82% events detected ≤2 months
+- median delay 1 month
+
+News ablation:
+- forecast exact 719.87 → 946.84 ₽
+- detection PR-AUC 0.3682 → 0.3639
+- prediction PR-AUC 0.0245 → 0.0269, but false alarms increase sharply
+
+## 11. Воспроизводимость
+
+./reproduce.sh
+
+Собственные модели, horizons, category replication, early warning, news ablation, examples и figures пересчитываются из raw CSV. Prophet / TimesFM могут использовать frozen cached predictions; полный refit documented separately.
