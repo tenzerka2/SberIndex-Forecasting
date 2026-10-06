@@ -21,3 +21,7 @@ outputs/shock_risk_latest.csv
 .DS_Store
 .idea/
 .vscode/
+
+# Large rolling-eval predictions (regenerate with benchmarks/rolling_eval.py)
+outputs/rolling_predictions.csv.gz
+catboost_info/
