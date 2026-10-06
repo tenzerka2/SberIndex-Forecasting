@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.env
+
+# Raw competition data
+data/raw/
+*.csv.zip
+
+# Large generated artifacts / models
+outputs/*.txt
+outputs/*predictions.csv
+outputs/detected_change_points.csv
+outputs/shock_backtest.csv
+outputs/future_forecasts_2025.csv
+outputs/shock_risk_latest.csv
+
+# OS / IDE
+.DS_Store
+.idea/
+.vscode/
