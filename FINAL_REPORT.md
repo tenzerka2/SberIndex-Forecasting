@@ -8,7 +8,8 @@
 2. Exact contest benchmark (2 016 рядов, origins 2024-06…09, h = 1–3, 24 192 пары): V3 MAE **719.87 ₽**, R² growth **0.4376**, wMAPE **2.284%** против V2 725.69 / 0.4274 / 2.302%.
 3. Выигрыш V3 маленький (−0.8%), но он воспроизводится на 5 нетронутых категориальных панелях: лучше V2 во всех 5 на exact (28 из 30 целевых месяцев) и на апреле–ноябре.
 4. V3-hedge на exact не лучше V2 (+0.6%), зато на остальных origins итоговой панели −14% MAE и не зависит от аномалии I квартала в муниципальных данных. На категориях результат смешанный (4 из 5 лучше на апреле–ноябре, Продовольствие +8%).
-5. Early warning: уже начавшийся сдвиг обнаруживается хорошо (PR-AUC 0.38 при частоте 1.8%, 82% сдвигов пойманы с медианной задержкой 1 месяц). Предсказать сдвиг за 1–3 месяца нельзя ни по самим рядам, ни по категориям, ни по национальным и недельным данным СберИндекса.\n6. Rubric-specific additions: проверены h=1/3/6/12, TimesFM 2.5 zero-shot и news/event pipeline по 95 заранее зафиксированным запросам; ни TimesFM, ни новости не улучшили frozen V3 point forecast.
+5. Early warning: уже начавшийся сдвиг обнаруживается хорошо (PR-AUC 0.38 при частоте 1.8%, 82% сдвигов пойманы с медианной задержкой 1 месяц). Предсказать сдвиг за 1–3 месяца нельзя ни по самим рядам, ни по категориям, ни по национальным и недельным данным СберИндекса.
+6. Rubric-specific additions: проверены h=1/3/6/12, TimesFM 2.5 zero-shot и news/event pipeline по 95 заранее зафиксированным запросам; ни TimesFM, ни новости не улучшили frozen V3 point forecast.
 
 ## 2. Данные и протокол
 
@@ -230,7 +231,10 @@ pip install -r requirements.txt
 | `figures/04_category_replication.png` | репликация на 5 нетронутых категориях, отклонённый недельный фактор |
 | `figures/05_shift_labels.png` | старая разметка сдвигов кодировала сезонность, новая нет |
 | `figures/06_early_warning.png` | детекция работает (21×), упреждение нет (≤ 2.5×) |
-| `figures/07_interval_coverage.png` | покрытие интервалов по целевым месяцам |\n| `figures/municipality_stable.png` | алгоритмически выбранный stable example |\n| `figures/municipality_shift.png` | типичный ряд со structural shift |\n| `figures/municipality_failure.png` | худший exact failure case |
+| `figures/07_interval_coverage.png` | покрытие интервалов по целевым месяцам |
+| `figures/municipality_stable.png` | алгоритмически выбранный stable example |
+| `figures/municipality_shift.png` | типичный ряд со structural shift |
+| `figures/municipality_failure.png` | худший exact failure case |
 
 ## 11. Презентация
 
