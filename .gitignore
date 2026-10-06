@@ -26,3 +26,8 @@ outputs/shock_risk_latest.csv
 outputs/rolling_predictions.csv.gz
 catboost_info/
 outputs/*.log
+
+# Foundation-model checkpoints (download with benchmarks/fetch_timesfm.py)
+models/
+.venv-tsfm/
+data/external/settlements.csv
