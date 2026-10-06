@@ -50,3 +50,22 @@ Therefore V2 is approximately 49% lower MAE than Prophet and approximately 4.8% 
 ## Important methodological note
 
 The contest history is only 24 months, so model-selection uncertainty is material. The V2 equal-weight ensemble is intentionally simple and reproducible. Before final submission, add sensitivity checks across alternative origin windows and bootstrap results by target month; do not claim universal superiority beyond the tested contest window.
+
+## V3 update (audit, 2026-10)
+
+Reproduced from scratch: MAE 725.686835, R2_growth 0.427449, wMAPE 2.30244% (asserted in `benchmarks/rolling_eval.py`).
+
+| Model | MAE exact | R² growth | wMAPE | MAE other origins (2024-04, 05, 10, 11) |
+|---|---:|---:|---:|---:|
+| V2 | 725.69 | 0.4274 | 2.302% | 925.1 |
+| **V3 = V2 + error feedback** | **719.87** | **0.4376** | **2.284%** | 921.7 |
+| V3-hedge (+ error feedback) | 730.14 | 0.4320 | 2.317% | 793.0 |
+
+V3 by horizon: h=1 592.86, h=2 716.98, h=3 849.76 RUB.
+
+Caveats found in the audit (details in `REPORT.md`):
+
+- V2's window choices rank 8/175 on this window but 84/175 on other origins; its edge here comes from offsetting biases of its two components, caused by a Q1-2023/Q1-2024 level anomaly in the municipal panel that enters the 6-month common-growth window.
+- The window has 6 target months. Bootstrap over target months gives a 95% CI of [−34, +32] RUB for V3-hedge minus V2, i.e. differences of this size are not significant.
+- Prophet with default settings is unstable on < 2 years of history (MAE ~21k RUB on a 400-series sample); a log-target Prophet gives 1,627 RUB on the same pairs (V2: 699).
+- MAE < 700 RUB was not reached by any time-safe method.
