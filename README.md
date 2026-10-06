@@ -1,45 +1,64 @@
-# SberIndex Forecasting v3 (final)
+# SberIndex Forecasting — final submission
 
-Прогноз потребительских безналичных расходов 2 016 муниципальных образований на 1–3 месяца и обнаружение структурных сдвигов. Документы подачи:
+Прогноз безналичных потребительских расходов 2 016 муниципальных образований, structural-shift detection и исследование внешних сигналов.
 
-- [`FINAL_REPORT.md`](FINAL_REPORT.md): метод, результаты, ablation, review, ограничения;
-- [`PRESENTATION.md`](PRESENTATION.md): 9 слайдов + appendix, тезисы и speaker notes;
-- [`PRESENTATION_DATA.md`](PRESENTATION_DATA.md): каждое число презентации с источником в outputs;
-- [`JURY_QA.md`](JURY_QA.md): 20 вопросов жюри и ответы;
-- [`METHOD.md`](METHOD.md), [`EXACT_BENCHMARK.md`](EXACT_BENCHMARK.md): краткая методология и протокол.
+## Главный результат
 
-## Финальные модели (заморожены в `src/sbx/final.py`)
+- V3 exact MAE: **719.87 ₽**
+- R² growth: **0.4376**
+- wMAPE: **2.284%**
+- V3 лучше V2 во всех 5 категориальных панелях, не использованных при выборе модели
+- detection structural shifts: PR-AUC **0.383** при base rate 1.82%, median delay 1 месяц
 
-| Модель | Роль | MAE exact | R² growth | wMAPE | MAE other origins | Категорий лучше V2 (апр–ноя) |
-|---|---|---:|---:|---:|---:|---:|
-| V2 (прежняя) | reference | 725.69 | 0.4274 | 2.302% | 925.1 | |
-| **V3** = V2 + error feedback | benchmark | **719.87** | **0.4376** | **2.284%** | 921.7 | 5 из 5 |
-| **V3-hedge** = хедж общего роста + error feedback | production | 730.14 | 0.4320 | 2.317% | **793.0** | 4 из 5 |
+## Что дополнительно проверено
 
-Exact protocol: origins 2024-06…2024-09, h = 1–3, 24 192 пары. Other: origins 2024-04, 05, 10, 11.
+- horizons **1 / 3 / 6 / 12**
+- **TimesFM 2.5-200M** zero-shot
+- Prophet sample benchmark
+- 5 category panels
+- national / weekly SberIndex signals
+- historical news/events: **95 pre-registered queries, 550 articles**
+- conformal intervals
+- deterministic stable / shift / failure municipality examples
+- time-safety / leakage tests
 
-Early warning: детекция уже начавшегося сдвига PR-AUC 0.38 при частоте 1.8% (82% сдвигов за ≤ 2 месяца, 2.1 ложной тревоги на 100 ряд-месяцев). Упреждение за 1–3 месяца не работает (lift ≤ 2.5×), недельные и национальные данные раннего сигнала не дают.
+Новости и TimesFM не улучшают point forecast V3; отрицательные результаты сохранены в ablation и используются в выводах.
 
-## Воспроизведение одной командой
+## Документы подачи
+
+- FINAL_REPORT.md — полный отчёт
+- METHOD.md — методология
+- PRESENTATION.md — финальные 10 слайдов + appendix
+- PRESENTATION_DATA.md — source map каждой цифры
+- JURY_QA.md — 25 вопросов жюри
+- RUBRIC_CHECKLIST.md — критерий → доказательство
+- REAL_EXAMPLES.md — реальные примеры МО
+- FINAL_SUBMISSION_STATUS.md — что отправлять
+
+## Воспроизведение
 
 ```bash
-python -m venv .venv && source .venv/bin/activate
+python -m venv .venv
+source .venv/bin/activate
 pip install -r requirements.txt
-mkdir -p data/raw   # распакуйте 5 исходных CSV СберИндекса (маски в data/README.md)
-./reproduce.sh      # ≈8 минут, всё с нуля; Prophet: REFIT_PROPHET=1 ./reproduce.sh (~1 ч)
+# распаковать 5 CSV СберИндекса в data/raw/
+./reproduce.sh
 ```
 
-Результат: `FINAL_METRICS.csv`, `ABLATION.csv`, `figures/`, `outputs/final_forecasts_2025.csv.gz` (обе модели, h = 1–12, интервалы 80/90%), промежуточные таблицы в `outputs/`.
+reproduce.sh пересчитывает собственные forecasting results, horizon benchmark, category replication, early warning, news ablation, real examples и figures. Prophet / TimesFM могут использовать frozen cached predictions; отдельный refit описан в benchmark scripts.
 
-## Структура
+## Основные файлы
 
-- `src/sbx/data.py`: восстановление рядов по блокам (МО, категория) сырого экспорта с проверками, национальные и недельные ряды;
-- `src/sbx/models.py`, `src/sbx/final.py`: все модели и замороженные финальные;
-- `src/sbx/backtest.py`: rolling-origin движок, метрики, bootstrap и sign test;
-- `src/sbx/intervals.py`: двухчастные conformal-интервалы;
-- `src/sbx/early_warning.py`, `src/sbx/ew_features.py`: определение сдвига, детекторы, признаки;
-- `benchmarks/`: `exact_backtest.py` (V2, 725.686835), `rolling_eval.py`, `category_replication.py`, `early_warning_eval.py`, `early_warning_v2.py`, `forecast_final.py`, `build_final.py`, `prophet_baseline.py`;
-- `tests/test_time_safety.py`: 7 тестов на утечку и реконструкцию;
-- `src/pipeline.py`: legacy pooled LightGBM для h = 1/3/6/12 (на 1 904 рядах без омонимов, не сопоставим с exact).
+- src/sbx/data.py — reconstruction 2 016 series
+- src/sbx/models.py / final.py — V2, V3, V3-hedge
+- src/sbx/intervals.py — time-safe conformal
+- src/sbx/early_warning.py / ew_features.py — shifts / detectors
+- src/sbx/news_global.py — verified publication-time news features
+- benchmarks/horizons_benchmark.py — 1/3/6/12
+- benchmarks/foundation_timesfm.py — TimesFM
+- benchmarks/news_ablation_global.py — no-news vs news
+- benchmarks/real_examples.py — deterministic examples
+- tests/test_time_safety.py
+- tests/test_news_time_safety.py
 
-Исходные CSV не коммитятся. Стабильного id МО нет: ключ ряда это `run_id` выгрузки; у омонимов совпадают названия.
+Исходные муниципальные CSV не коммитятся. Стабильного id МО в экспорте нет; технический ключ полного ряда — run_id raw export.
