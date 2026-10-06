@@ -8,7 +8,7 @@
 2. Exact contest benchmark (2 016 рядов, origins 2024-06…09, h = 1–3, 24 192 пары): V3 MAE **719.87 ₽**, R² growth **0.4376**, wMAPE **2.284%** против V2 725.69 / 0.4274 / 2.302%.
 3. Выигрыш V3 маленький (−0.8%), но он воспроизводится на 5 нетронутых категориальных панелях: лучше V2 во всех 5 на exact (28 из 30 целевых месяцев) и на апреле–ноябре.
 4. V3-hedge на exact не лучше V2 (+0.6%), зато на остальных origins итоговой панели −14% MAE и не зависит от аномалии I квартала в муниципальных данных. На категориях результат смешанный (4 из 5 лучше на апреле–ноябре, Продовольствие +8%).
-5. Early warning: уже начавшийся сдвиг обнаруживается хорошо (PR-AUC 0.38 при частоте 1.8%, 82% сдвигов пойманы с медианной задержкой 1 месяц). Предсказать сдвиг за 1–3 месяца нельзя ни по самим рядам, ни по категориям, ни по национальным и недельным данным СберИндекса.
+5. Early warning: уже начавшийся сдвиг обнаруживается хорошо (PR-AUC 0.38 при частоте 1.8%, 82% сдвигов пойманы с медианной задержкой 1 месяц). Предсказать сдвиг за 1–3 месяца нельзя ни по самим рядам, ни по категориям, ни по национальным и недельным данным СберИндекса.\n6. Rubric-specific additions: проверены h=1/3/6/12, TimesFM 2.5 zero-shot и news/event pipeline по 95 заранее зафиксированным запросам; ни TimesFM, ни новости не улучшили frozen V3 point forecast.
 
 ## 2. Данные и протокол
 
@@ -215,7 +215,7 @@ Frozen ablation не дал полезного улучшения:
 python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
 # распаковать 5 CSV СберИндекса в data/raw/
-./reproduce.sh            # ≈8 минут; REFIT_PROPHET=1 ./reproduce.sh для перефита Prophet (~1 ч)
+./reproduce.sh            # ≈10 минут без optional refit; REFIT_PROPHET=1 для полного Prophet refit
 ```
 
 Артефакты: `FINAL_METRICS.csv`, `ABLATION.csv`, horizon/TimesFM outputs, news ablation outputs, `outputs/real_examples.csv`, `figures/`, `outputs/final_forecasts_2025.csv.gz`, category replication и early-warning tables. Source map всех headline-цифр: `PRESENTATION_DATA.md`.
@@ -230,7 +230,7 @@ pip install -r requirements.txt
 | `figures/04_category_replication.png` | репликация на 5 нетронутых категориях, отклонённый недельный фактор |
 | `figures/05_shift_labels.png` | старая разметка сдвигов кодировала сезонность, новая нет |
 | `figures/06_early_warning.png` | детекция работает (21×), упреждение нет (≤ 2.5×) |
-| `figures/07_interval_coverage.png` | покрытие интервалов по целевым месяцам |
+| `figures/07_interval_coverage.png` | покрытие интервалов по целевым месяцам |\n| `figures/municipality_stable.png` | алгоритмически выбранный stable example |\n| `figures/municipality_shift.png` | типичный ряд со structural shift |\n| `figures/municipality_failure.png` | худший exact failure case |
 
 ## 11. Презентация
 
