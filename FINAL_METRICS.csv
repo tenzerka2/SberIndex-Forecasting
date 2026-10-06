@@ -52,3 +52,15 @@ exact_sample400,1-3,factor_only6,4800,964.5422,0.9832,0.2396,3.1222,prophet colu
 exact_sample400,1-3,v2_ensemble,4800,699.1787,0.9920,0.4819,2.2632,prophet columns from cached outputs/prophet_predictions.csv.gz (REFIT_PROPHET=1 refits); other rows recomputed
 exact_sample400,1-3,v3,4800,694.0613,0.9922,0.4905,2.2467,prophet columns from cached outputs/prophet_predictions.csv.gz (REFIT_PROPHET=1 refits); other rows recomputed
 exact_sample400,1-3,v3_hedge,4800,705.1070,0.9921,0.4811,2.2824,prophet columns from cached outputs/prophet_predictions.csv.gz (REFIT_PROPHET=1 refits); other rows recomputed
+horizons_all_2016_series,1,v3,20160,893.5152,0.9892,0.2943,2.8379,outputs/horizons_metrics.csv
+horizons_all_2016_series,1,v3_hedge,20160,749.2073,0.9921,0.4693,2.3796,outputs/horizons_metrics.csv
+horizons_all_2016_series,1,timesfm_yoy,20160,926.0694,0.9885,0.1614,2.9413,outputs/horizons_metrics.csv
+horizons_all_2016_series,3,v3,16128,1168.3040,0.9808,-0.3699,3.6746,outputs/horizons_metrics.csv
+horizons_all_2016_series,3,v3_hedge,16128,1049.3676,0.9843,-0.0987,3.3005,outputs/horizons_metrics.csv
+horizons_all_2016_series,3,timesfm_yoy,16128,1328.3435,0.9780,-0.8020,4.1779,outputs/horizons_metrics.csv
+horizons_all_2016_series,6,v3,10080,1318.9489,0.9776,-0.7056,4.0903,outputs/horizons_metrics.csv
+horizons_all_2016_series,6,v3_hedge,10080,1243.0779,0.9801,-0.4298,3.8550,outputs/horizons_metrics.csv
+horizons_all_2016_series,6,timesfm_yoy,10080,1778.9449,0.9610,-1.9554,5.5169,outputs/horizons_metrics.csv
+horizons_all_2016_series,12,seasonal_naive,24192,4079.2547,0.8330,-5.1301,13.3106,outputs/horizons_metrics.csv
+horizons_all_2016_series,12,naive_x_national_yoy,24192,1522.3656,0.9665,-0.1874,4.9675,outputs/horizons_metrics.csv
+horizons_all_2016_series,12,timesfm_raw,24192,4937.2330,0.7415,-8.2570,16.1102,outputs/horizons_metrics.csv
