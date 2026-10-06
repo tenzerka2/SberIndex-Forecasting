@@ -12,7 +12,10 @@ def main():
     close(e[(e.task=="predict")&(e.model=="base_news")].PR_AUC.iloc[0],0.0269,.003)
     x=pd.read_csv(ROOT/"outputs/real_examples.csv")
     assert set(x.role)=={"stable","shift","failure"}
+    assert int(x[x.role=="stable"].run_id.iloc[0])==13015
+    close(x[x.role=="stable"].exact_mae_v3.iloc[0],346.887,.1)
     assert int(x[x.role=="shift"].run_id.iloc[0])==406
+    assert int(x[x.role=="failure"].run_id.iloc[0])==2242
     h=pd.read_csv(ROOT/"outputs/horizons_metrics.csv")
     assert {1,3,6,12}.issubset(set(h.h.dropna().astype(int)))
     print("ok final additions")
