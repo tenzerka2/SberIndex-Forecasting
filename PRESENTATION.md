@@ -139,7 +139,7 @@ Figures:
 
 **Не cherry-pick: правила выбора зафиксированы в коде**
 
-- stable: Кавалеровский МО — exact MAE 165.5 ₽
+- stable: Кармаскалинский муниципальный район — exact MAE 346.9 ₽
 - shift: Североуральский ГО — shift 2024-10, MAE 795.1 ₽
 - failure: Нижнеколымский район — MAE 5 927 ₽
 - `./reproduce.sh` + leakage tests + exact source for every headline number
