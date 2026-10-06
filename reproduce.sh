@@ -1,29 +1,34 @@
 #!/usr/bin/env bash
-# One-command reproduction of FINAL_REPORT.md / PRESENTATION_DATA.md (~8 min on 4 cores).
+# One-command reproduction of the final submission (~10 min on 4 cores, excluding optional refits).
 #
-# Everything produced by our models is recomputed from the raw CSVs in data/raw/:
-# reconstruction, all backtests, category replication, early warning, intervals, 2025 forecasts,
-# FINAL_METRICS.csv, ABLATION.csv, figures/ and outputs/presentation_sources.json.
-#
-# The only exception is the Prophet baseline (400-series sample, ~7 s per cmdstan fit, ~1 h in
-# total). By default its cached predictions in outputs/prophet_predictions.csv.gz are re-scored
-# against freshly computed targets; run   REFIT_PROPHET=1 ./reproduce.sh   to refit it from scratch.
+# All in-house results are recomputed from data/raw/. Prophet and TimesFM may use frozen cached
+# predictions by default because full refits are expensive; their benchmark scripts document refit.
 set -euo pipefail
 cd "$(dirname "$0")"
 PY=${PYTHON:-python}
 
-$PY benchmarks/exact_backtest.py > /dev/null                        # V2 contest benchmark, MAE 725.686835
-$PY tests/test_time_safety.py                                       # 7 leakage / reconstruction tests
+$PY benchmarks/exact_backtest.py > /dev/null
+$PY tests/test_time_safety.py
+$PY tests/test_news_time_safety.py
+
 if [[ "${REFIT_PROPHET:-0}" == "1" ]]; then
-  $PY benchmarks/prophet_baseline.py                                # default Prophet, sample of 400 series
-  $PY benchmarks/prophet_baseline.py --variant log                  # log-target Prophet, same sample
+  $PY benchmarks/prophet_baseline.py
+  $PY benchmarks/prophet_baseline.py --variant log
+  $PY benchmarks/prophet_horizons.py
 fi
-$PY src/pipeline.py > outputs/pipeline.log                          # legacy pooled LightGBM + honest legacy shock metrics
-$PY benchmarks/rolling_eval.py > outputs/rolling_eval.log           # all models, 10 origins, bootstrap, intervals
+
+$PY src/pipeline.py > outputs/pipeline.log
+$PY benchmarks/rolling_eval.py > outputs/rolling_eval.log
 $PY benchmarks/category_replication.py > outputs/category_replication.log
-$PY benchmarks/early_warning_eval.py > outputs/early_warning_eval.log   # fixed-split EW (first iteration)
-$PY benchmarks/early_warning_v2.py > outputs/early_warning_v2.log   # rolling EW (final)
-$PY benchmarks/forecast_final.py > outputs/forecast_final.log       # 2025 forecasts + intervals
-$PY benchmarks/build_final.py > outputs/build_final.log             # FINAL_METRICS, ABLATION, figures, sources
-$PY tests/check_presentation_numbers.py                             # quoted numbers == outputs
-echo "done: FINAL_METRICS.csv ABLATION.csv figures/ outputs/presentation_sources.json outputs/final_forecasts_2025.csv.gz"
+$PY benchmarks/horizons_benchmark.py > outputs/horizons_benchmark.log
+$PY benchmarks/early_warning_eval.py > outputs/early_warning_eval.log
+$PY benchmarks/early_warning_v2.py > outputs/early_warning_v2.log
+$PY benchmarks/news_ablation_global.py > outputs/news_ablation.log
+$PY benchmarks/forecast_final.py > outputs/forecast_final.log
+$PY benchmarks/real_examples.py > outputs/real_examples.log
+$PY benchmarks/build_final.py > outputs/build_final.log
+
+$PY tests/check_presentation_numbers.py
+$PY tests/check_final_additions.py
+
+echo "done: forecasting + horizons + TimesFM cache + early warning + news ablation + real examples + figures"
