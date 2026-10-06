@@ -121,8 +121,6 @@ def exact_backtest() -> tuple[pd.DataFrame, dict]:
         "R2_growth": r2(pred["growth"], pred["growth_hat"]),
         "wMAPE_pct": float(100 * pred["ae"].sum() / pred["y"].abs().sum()),
         "per_h": per_h,
-        "public_prophet_mae": 1428,
-        "public_reference_ensemble_mae": 762,
     }
     return pred, summary
 

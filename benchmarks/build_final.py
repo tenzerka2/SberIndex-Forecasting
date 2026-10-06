@@ -64,7 +64,8 @@ def final_metrics() -> pd.DataFrame:
     if s.get("prophet_sample"):
         for m, v in s["prophet_sample"].items():
             if isinstance(v, dict):
-                rows.append({"window": "exact_sample400", "h": "1-3", "model": m, **v})
+                rows.append({"window": "exact_sample400", "h": "1-3", "model": m, **v,
+                             "source": "prophet columns from cached outputs/prophet_predictions.csv.gz (REFIT_PROPHET=1 refits); other rows recomputed"})
     out = pd.DataFrame(rows)
     out.to_csv(ROOT / "FINAL_METRICS.csv", index=False, float_format="%.4f")
     return out
@@ -106,6 +107,11 @@ def fig_anomaly():
     muni = 100 * (np.exp(f - f.shift(12)) - 1)
     nat = national_monthly()["nat_yoy_nominal"]
     x = p.periods[12:]
+    lvl = f - np.log(national_monthly()["nat_spend"].reindex(p.periods))
+    pd.DataFrame({"muni_median_yoy_pct": muni.loc[x].to_numpy(), "national_yoy_nominal_pct": nat.reindex(x).to_numpy()},
+                 index=pd.Index(x.strftime("%Y-%m"), name="month")).to_csv(OUT / "common_factor_vs_national.csv", float_format="%.2f")
+    pd.DataFrame({"log_muni_median_minus_log_national_demeaned_pct": 100 * (lvl - lvl.iloc[12:].mean()).to_numpy()},
+                 index=pd.Index(p.periods.strftime("%Y-%m"), name="month")).to_csv(OUT / "common_level_gap.csv", float_format="%.2f")
     fig, ax = plt.subplots(figsize=(8, 4.2))
     ax.plot(x, muni.loc[x], color=BLUE, lw=2, marker="o", ms=5)
     ax.plot(x, nat.reindex(x), color=ORANGE, lw=2, marker="o", ms=5)
@@ -188,6 +194,9 @@ def fig_labels():
     p = load_panel()
     new = pd.Series(EW.events(p.logs).mean(axis=0) * 100, index=p.periods)
     x = p.periods[3:22]
+    pd.DataFrame({"legacy_raw_level_pct": leg.reindex(x).to_numpy(), "new_panel_relative_pct": new.reindex(x).to_numpy(),
+                  "legacy_n_series": panel_legacy["mo"].nunique(), "new_n_series": p.values.shape[0]},
+                 index=pd.Index(x.strftime("%Y-%m"), name="month")).to_csv(OUT / "shift_label_rates.csv", float_format="%.3f")
     fig, ax = plt.subplots(figsize=(8.5, 4.2))
     ax.plot(x, leg.reindex(x), color=ORANGE, lw=2, marker="o", ms=5, label="старая разметка (сырые уровни)")
     ax.plot(x, new.reindex(x), color=BLUE, lw=2, marker="o", ms=5, label="новая разметка (относительно панели, без сезонного эха)")
@@ -232,6 +241,8 @@ def fig_intervals():
     c = c[c["origin"] >= "2024-04-01"].dropna(subset=["v3_lo80"])
     cov = c.assign(c80=(c.y >= c.v3_lo80) & (c.y <= c.v3_hi80), c90=(c.y >= c.v3_lo90) & (c.y <= c.v3_hi90))
     g = cov.groupby("target_date")[["c80", "c90"]].mean() * 100
+    g.rename(columns={"c80": "coverage80_pct", "c90": "coverage90_pct"}).assign(
+        n_pairs=cov.groupby("target_date").size()).to_csv(OUT / "interval_coverage_by_month.csv", float_format="%.2f")
     fig, ax = plt.subplots(figsize=(8.5, 4.2))
     ax.plot(g.index, g["c80"], color=BLUE, lw=2, marker="o", ms=5, label="интервал 80%")
     ax.plot(g.index, g["c90"], color=ORANGE, lw=2, marker="o", ms=5, label="интервал 90%")
@@ -242,6 +253,80 @@ def fig_intervals():
     save(fig, "07_interval_coverage.png")
 
 
+def presentation_sources():
+    """Write every number quoted in the presentation that is not already in another output."""
+    from sbx import models as M
+    from sbx.data import read_raw_municipal
+
+    # data audit
+    raw = read_raw_municipal()
+    audit = {"raw_rows": int(len(raw)), "unique_names": int(raw["mo"].nunique()), "periods": [str(raw["period"].min().date()), str(raw["period"].max().date())]}
+    tot = load_panel()
+    audit["complete_series_total"] = int(tot.values.shape[0])
+    audit["homonym_series"] = int(tot.meta["homonym"].sum())
+    audit["homonym_names"] = int(tot.meta.loc[tot.meta["homonym"], "mo"].nunique())
+    names_dup = raw[raw["category_15"].eq("Все категории")].groupby("run_id")["mo"].first()
+    audit["names_with_several_municipalities"] = int((names_dup.value_counts() > 1).sum())
+    t = raw[raw["category_15"].eq("Все категории")].groupby("run_id").size()
+    audit["incomplete_series_total"] = int((t != 24).sum())
+    legacy = {}
+    for c in raw["category_15"].unique():
+        a = raw[raw["category_15"] == c].reset_index()
+        a["blk"] = (a["mo"] != a["mo"].shift()).cumsum()
+        g = a.groupby("blk").agg(runs=("run_id", "nunique"), n=("period", "size"), s=("period", "min"), e=("period", "max"))
+        legacy[c] = {"legacy_merged_blocks": int((g["runs"] > 1).sum()),
+                     "legacy_complete_series": int(((g["n"] == 24) & (g["s"] == "2023-01-01") & (g["e"] == "2024-12-01")).sum()),
+                     "robust_complete_series": int(load_panel(c).values.shape[0])}
+    audit["reconstruction_by_category"] = legacy
+    from sbx.ew_features import category_matrices
+    audit["category_linkable_series"] = int((~np.isnan(category_matrices(tot)["Здоровье"][:, 0])).sum())
+    (OUT / "data_audit.json").write_text(json.dumps(audit, ensure_ascii=False, indent=2), encoding="utf-8")
+
+    # V2 hyper-parameter grid: where does V2 rank on exact vs other origins?
+    nat = national_monthly()
+    ms = {**{f"L{k}": M.seasonal_growth(k) for k in (1, 2, 3, 4, 6)}, **{f"F{k}": M.panel_factor(k) for k in (1, 2, 3, 4, 6, 9, 12)}}
+    df = B.run(tot, ms, pd.date_range("2024-04-01", "2024-11-01", freq="MS"), ctx_fn=lambda o: {"origin": o})
+    ex = df["origin"].isin(B.EXACT_ORIGINS)
+    rows = []
+    for kl in (1, 2, 3, 4, 6):
+        for kf in (1, 2, 3, 4, 6, 9, 12):
+            for w in (0.3, 0.4, 0.5, 0.6, 0.7):
+                ae = (w * df[f"L{kl}"] + (1 - w) * df[f"F{kf}"] - df["y"]).abs()
+                rows.append({"local_window": kl, "factor_window": kf, "w_local": w, "MAE_exact": ae[ex].mean(), "MAE_other": ae[~ex].mean()})
+    grid = pd.DataFrame(rows)
+    v2 = grid[(grid.local_window == 2) & (grid.factor_window == 6) & (grid.w_local == 0.5)].iloc[0]
+    grid["better_than_V2_exact"] = grid["MAE_exact"] < v2["MAE_exact"] - 1e-9
+    grid["better_than_V2_other"] = grid["MAE_other"] < v2["MAE_other"] - 1e-9
+    grid.to_csv(OUT / "v2_grid.csv", index=False, float_format="%.3f")
+    best = grid.loc[grid["MAE_exact"].idxmin()]
+    grid_summary = {"n_configs": int(len(grid)), "configs_better_than_V2_exact": int(grid["better_than_V2_exact"].sum()),
+                    "configs_better_than_V2_other": int(grid["better_than_V2_other"].sum()),
+                    "best_exact_config": best[["local_window", "factor_window", "w_local"]].to_dict(),
+                    "best_exact_MAE_exact": float(best["MAE_exact"]), "best_exact_MAE_other": float(best["MAE_other"])}
+
+    # V2 idiosyncratic h=1 error autocorrelation between consecutive origins (motivation of V3)
+    d1 = B.run(tot, {"v2": M.v2_ensemble}, pd.date_range("2024-02-01", "2024-11-01", freq="MS"), horizons=[1])
+    d1["e"] = np.log(d1["y"] / d1["v2"])
+    d1["e"] -= d1.groupby("origin")["e"].transform("median")
+    E = d1.pivot(index="series", columns="origin", values="e")
+    ac = [{"origin_a": str(E.columns[j].date()), "origin_b": str(E.columns[j + 1].date()),
+           "corr": float(np.corrcoef(E.iloc[:, j], E.iloc[:, j + 1])[0, 1])} for j in range(E.shape[1] - 1)]
+    pd.DataFrame(ac).to_csv(OUT / "v2_error_autocorr.csv", index=False, float_format="%.4f")
+
+    # 2025 forecasts: how different are the two final models?
+    f = pd.read_csv(OUT / "final_forecasts_2025.csv.gz")
+    gap = (f["v3_hedge"] / f["v3"] - 1).abs().groupby(f["h"]).median() * 100
+    s = json.loads((OUT / "rolling_summary.json").read_text())
+    summary = {"v2_grid": grid_summary,
+               "v2_error_autocorr_range": [min(r["corr"] for r in ac), max(r["corr"] for r in ac)],
+               "v2_error_autocorr_negative_pairs": f"{sum(r['corr'] < 0 for r in ac)}/{len(ac)}",
+               "forecast_2025_median_abs_gap_v3_vs_hedge_pct_by_h": gap.round(3).to_dict(),
+               "v3_vs_v2_tests": s["bootstrap_vs_v2"]["exact"]["v3"],
+               "prophet_sample_source": "outputs/prophet_predictions.csv.gz (cached; refit with REFIT_PROPHET=1)"}
+    (OUT / "presentation_sources.json").write_text(json.dumps(summary, ensure_ascii=False, indent=2, default=float), encoding="utf-8")
+    print("presentation sources", json.dumps(summary, ensure_ascii=False, default=float)[:600])
+
+
 def main():
     if "--figures-only" in sys.argv:
         for f in [fig_anomaly, fig_mae_by_origin, fig_ablation, fig_replication, fig_labels, fig_ew, fig_intervals]:
@@ -249,6 +334,7 @@ def main():
         return
     fm = final_metrics()
     ab = ablation()
+    presentation_sources()
     for f in [fig_anomaly, fig_mae_by_origin, fig_ablation, fig_replication, fig_labels, fig_ew, fig_intervals]:
         f()
         print("figure", f.__name__, flush=True)

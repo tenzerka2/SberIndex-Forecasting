@@ -1,0 +1,46 @@
+{
+  "raw_rows": 303126,
+  "unique_names": 2118,
+  "periods": [
+    "2023-01-01",
+    "2024-12-01"
+  ],
+  "complete_series_total": 2016,
+  "homonym_series": 107,
+  "homonym_names": 43,
+  "names_with_several_municipalities": 49,
+  "incomplete_series_total": 174,
+  "reconstruction_by_category": {
+    "Все категории": {
+      "legacy_merged_blocks": 0,
+      "legacy_complete_series": 2016,
+      "robust_complete_series": 2016
+    },
+    "Здоровье": {
+      "legacy_merged_blocks": 1,
+      "legacy_complete_series": 2014,
+      "robust_complete_series": 2016
+    },
+    "Общественное питание": {
+      "legacy_merged_blocks": 0,
+      "legacy_complete_series": 2016,
+      "robust_complete_series": 2016
+    },
+    "Продовольствие": {
+      "legacy_merged_blocks": 1,
+      "legacy_complete_series": 2014,
+      "robust_complete_series": 2016
+    },
+    "Маркетплейсы": {
+      "legacy_merged_blocks": 0,
+      "legacy_complete_series": 2016,
+      "robust_complete_series": 2016
+    },
+    "Транспорт": {
+      "legacy_merged_blocks": 0,
+      "legacy_complete_series": 2016,
+      "robust_complete_series": 2016
+    }
+  },
+  "category_linkable_series": 1909
+}

@@ -1,6 +1,12 @@
 # SberIndex Forecasting v3 (final)
 
-Прогноз потребительских безналичных расходов 2 016 муниципальных образований на 1–3 месяца и обнаружение структурных сдвигов. Главный документ: [`FINAL_REPORT.md`](FINAL_REPORT.md) (метод, результаты, ablation, review, ограничения, структура презентации).
+Прогноз потребительских безналичных расходов 2 016 муниципальных образований на 1–3 месяца и обнаружение структурных сдвигов. Документы подачи:
+
+- [`FINAL_REPORT.md`](FINAL_REPORT.md): метод, результаты, ablation, review, ограничения;
+- [`PRESENTATION.md`](PRESENTATION.md): 9 слайдов + appendix, тезисы и speaker notes;
+- [`PRESENTATION_DATA.md`](PRESENTATION_DATA.md): каждое число презентации с источником в outputs;
+- [`JURY_QA.md`](JURY_QA.md): 20 вопросов жюри и ответы;
+- [`METHOD.md`](METHOD.md), [`EXACT_BENCHMARK.md`](EXACT_BENCHMARK.md): краткая методология и протокол.
 
 ## Финальные модели (заморожены в `src/sbx/final.py`)
 
@@ -20,7 +26,7 @@ Early warning: детекция уже начавшегося сдвига PR-AU
 python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
 mkdir -p data/raw   # распакуйте 5 исходных CSV СберИндекса (маски в data/README.md)
-./reproduce.sh      # ~7 минут
+./reproduce.sh      # ≈8 минут, всё с нуля; Prophet: REFIT_PROPHET=1 ./reproduce.sh (~1 ч)
 ```
 
 Результат: `FINAL_METRICS.csv`, `ABLATION.csv`, `figures/`, `outputs/final_forecasts_2025.csv.gz` (обе модели, h = 1–12, интервалы 80/90%), промежуточные таблицы в `outputs/`.

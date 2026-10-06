@@ -50,7 +50,8 @@ def main():
     out.insert(2, "mo", panel.meta["mo"].to_numpy()[out["series"]])
     out.insert(3, "homonym", panel.meta["homonym"].to_numpy()[out["series"]])
     out["evidence"] = np.select([out["h"] <= 3, out["h"] <= 6], ["backtested", "limited"], "not_backtestable")
-    out.to_csv(ROOT / "outputs" / "final_forecasts_2025.csv.gz", index=False, float_format="%.1f")
+    out.to_csv(ROOT / "outputs" / "final_forecasts_2025.csv.gz", index=False, float_format="%.1f",
+               compression={"method": "gzip", "mtime": 0})  # byte-stable across reruns
     print(out.groupby("h")[["v3", "v3_hedge"]].median().round(0).to_string())
     print(out.head(3).T.to_string())
 

@@ -1,0 +1,50 @@
+{
+  "v2_grid": {
+    "n_configs": 175,
+    "configs_better_than_V2_exact": 8,
+    "configs_better_than_V2_other": 84,
+    "best_exact_config": {
+      "local_window": 3,
+      "factor_window": 9,
+      "w_local": 0.6
+    },
+    "best_exact_MAE_exact": 715.5994801049033,
+    "best_exact_MAE_other": 931.5436993086809
+  },
+  "v2_error_autocorr_range": [
+    -0.19988444433834293,
+    0.07275386906221129
+  ],
+  "v2_error_autocorr_negative_pairs": "8/9",
+  "forecast_2025_median_abs_gap_v3_vs_hedge_pct_by_h": {
+    "1": 0.379,
+    "2": 0.383,
+    "3": 0.383,
+    "4": 0.382,
+    "5": 0.381,
+    "6": 0.381,
+    "7": 0.383,
+    "8": 0.383,
+    "9": 0.382,
+    "10": 0.382,
+    "11": 0.381,
+    "12": 0.384
+  },
+  "v3_vs_v2_tests": {
+    "diff": -5.816643518127808,
+    "ci95_by_series": [
+      -7.20687574424983,
+      -4.519204566647919
+    ],
+    "p_boot_by_series": 0.0,
+    "ci95_by_target_date": [
+      -7.536400454236228,
+      -3.53806749304045
+    ],
+    "p_boot_by_target_date": 0.0,
+    "months_better": 6,
+    "months_total": 6,
+    "sign_test_p_one_sided": 0.015625
+  },
+  "prophet_sample_source": "outputs/prophet_predictions.csv.gz (cached; refit with REFIT_PROPHET=1)"
+}

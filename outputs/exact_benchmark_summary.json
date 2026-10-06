@@ -42,7 +42,5 @@
       "R2_growth": 0.25888762118857367,
       "wMAPE_pct": 2.65309976504106
     }
-  ],
-  "public_prophet_mae": 1428,
-  "public_reference_ensemble_mae": 762
+  ]
 }
