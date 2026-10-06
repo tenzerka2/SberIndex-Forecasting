@@ -1,0 +1,11 @@
+{
+  "records": 550,
+  "query_ids": 95,
+  "usable_articles_after_date_check": 517,
+  "date_conflicts": 10,
+  "query_month_mismatches_excluded": 11,
+  "missing_dates_excluded": 22,
+  "coverage": "2023-05..2024-11",
+  "collection_plan": "data/news/query_plan.csv frozen before full collection",
+  "note": "Global-month ablation uses only verified publication dates <= forecast origin; municipality geo-linking remains a prototype and is not used for the headline news result."
+}

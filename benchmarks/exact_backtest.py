@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import sys
 from pathlib import Path
 
 import numpy as np
@@ -8,7 +9,9 @@ import pandas as pd
 from sklearn.metrics import r2_score
 
 ROOT = Path(__file__).resolve().parents[1]
-RAW = ROOT / "data" / "raw"
+sys.path.insert(0, str(ROOT / "src"))
+from sbx import data as sbx_data  # noqa: E402
+
 OUT = ROOT / "outputs"
 OUT.mkdir(exist_ok=True)
 
@@ -16,39 +19,18 @@ ORIGINS = pd.to_datetime(["2024-06-01", "2024-07-01", "2024-08-01", "2024-09-01"
 HORIZONS = [1, 2, 3]
 
 
-def find_municipal_csv() -> Path:
-    files = sorted(RAW.glob("potrebitelskie-beznalicnye*.csv"))
-    if not files:
-        raise FileNotFoundError("Put the unpacked municipal SberIndex CSV in data/raw/")
-    return files[0]
-
-
 def load_panel() -> tuple[pd.DataFrame, pd.DataFrame]:
-    """Reconstruct series identity from contiguous row blocks.
+    """Reconstruct series identity from raw (mo, category) row runs (see src/sbx/data.py).
 
-    The supplied export contains duplicate municipality names but no stable municipality id.
-    For the exact contest benchmark we preserve duplicate names as distinct series by using
-    contiguous row blocks in the original export order, which reproduces 2,016 complete rows.
+    The export is a shuffle of per-(municipality, category) blocks, each sorted by month. Runs are
+    labelled on the raw file before filtering to the total category, with assertions that the
+    legacy filter-first reconstruction gives the same 2,016 series and that no two series coincide.
     """
-    df = pd.read_csv(find_municipal_csv(), sep=";")
-    df["period"] = pd.to_datetime(df["period"])
-    d = df[df["category_15"].eq("Все категории")].copy().reset_index(drop=True)
-    d["series_id"] = (d["mo"] != d["mo"].shift()).cumsum()
-    meta = d.groupby("series_id").agg(
-        mo=("mo", "first"), n=("period", "size"), start=("period", "min"), end=("period", "max")
-    )
-    full = meta[
-        (meta["n"] == 24)
-        & (meta["start"] == pd.Timestamp("2023-01-01"))
-        & (meta["end"] == pd.Timestamp("2024-12-01"))
-    ].index
-    panel = (
-        d[d["series_id"].isin(full)]
-        .pivot(index="series_id", columns="period", values="value")
-        .sort_index()
-        .astype(float)
-    )
-    return panel, meta.loc[full]
+    p = sbx_data.load_panel()
+    panel = pd.DataFrame(p.values, index=pd.Index(p.meta["run_id"], name="series_id"), columns=p.periods)
+    meta = p.meta.set_index("run_id")
+    meta.index.name = "series_id"
+    return panel, meta
 
 
 def local_sng2(wide: pd.DataFrame, horizons: list[int]) -> pd.DataFrame:
@@ -139,8 +121,6 @@ def exact_backtest() -> tuple[pd.DataFrame, dict]:
         "R2_growth": r2(pred["growth"], pred["growth_hat"]),
         "wMAPE_pct": float(100 * pred["ae"].sum() / pred["y"].abs().sum()),
         "per_h": per_h,
-        "public_prophet_mae": 1428,
-        "public_reference_ensemble_mae": 762,
     }
     return pred, summary
 

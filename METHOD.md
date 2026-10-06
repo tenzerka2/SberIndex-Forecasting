@@ -1,137 +1,123 @@
-# Методологический отчёт — V2
+# Методология — финальная версия
 
-## 1. Постановка
+## 1. Задача
 
-Решаются две связанные задачи: прогноз месячных безналичных потребительских расходов в муниципальных образованиях на горизонтах 1, 3, 6 и 12 месяцев; раннее предупреждение структурных изменений/шоков.
+Прогноз месячных безналичных потребительских расходов 2 016 муниципальных образований и анализ структурных сдвигов. Основной contest-style benchmark: origins 2024-06…09, h=1–3, 24 192 пары. Отдельно проверены горизонты 1/3/6/12.
 
-Решение строится как воспроизводимая и интерпретируемая baseline-plus система без использования информации из будущего.
+## 2. Данные и идентичность рядов
 
-## 2. Аудит данных
+Муниципальный экспорт покрывает 2023-01…2024-12 и не содержит стабильного id. Ряд восстанавливается как непрерывный raw-block (МО, категория) с возрастающим месяцем. Полных рядов: 2 016; среди них 107 омонимов под 43 названиями. run_id выгрузки используется как технический ключ.
 
-Основной муниципальный датасет содержит месячные наблюдения за 2023-01 — 2024-12 и несколько категорий расходов.
+Внешние данные:
+- национальные месячные расходы / nominal & real YoY / SA-index;
+- национальные недельные категории;
+- исторический news/event corpus по заранее зафиксированному query plan.
 
-В описании набора указан уникальный id муниципалитета, однако в переданном CSV стабильного id нет. Встречаются омонимичные названия муниципалитетов.
+Все exogenous features выравниваются по времени и доступны только если их дата ≤ forecast origin.
 
-Для основного pooled pipeline неоднозначные названия исключаются, чтобы не усреднять разные муниципалитеты. Для exact contest benchmark идентичность временных рядов восстанавливается по contiguous row blocks исходного экспорта, что сохраняет разные муниципалитеты с одинаковым названием и даёт 2 016 полных рядов.
+## 3. Forecasting
 
-Дополнительно используются только данные, известные на forecast origin:
+Пусть f_t — медиана log-расходов по МО, d_it = log y_it − f_t.
 
-- общероссийские потребительские расходы СберИндекса;
-- номинальный и реальный рост расходов;
-- сезонно сглаженный индекс;
-- недельное изменение трат по категориям, агрегированное в monthly pulse.
+- local_sng2: тот же месяц год назад × собственный средний YoY последних двух месяцев.
+- panel factor: текущая позиция МО относительно медианы + общий path панели.
+- V2: 50/50 смесь local и panel в рублях.
+- V3: V2 + error feedback по двум последним известным idiosyncratic one-step errors. Коэффициенты оцениваются только на прошлых forecast pairs с уже наблюдаемыми target.
+- V3-hedge: тот же error feedback, но общий рост panel-part = среднее municipal 6m, municipal 2m и national 2m YoY.
 
-## 3. Основной pooled forecasting pipeline
+V3 — benchmark model. V3-hedge — robust/production alternative.
 
-Используется global pooled LightGBM. Одна модель обучается на множестве муниципалитетов и различает горизонт прогноза. Target преобразуется через log1p, после прогноза выполняется обратное преобразование.
+## 4. Горизонты 1 / 3 / 6 / 12
 
-Это оправдано короткой историей каждого отдельного муниципалитета: 24 месячные точки недостаточны для устойчивого локального forecasting на длинных горизонтах, но pooled-модель переносит закономерности между множеством рядов.
+Отдельный benchmark использует одинаковые пары внутри каждого горизонта.
 
-Признаки включают:
+- h=1: 10 origins
+- h=3: 8 origins
+- h=6: 5 origins
+- h=12: V3/V3-hedge не определены на исторических origins с наблюдаемым target, потому что им нужен observable municipal YoY на origin. Для h=12 сравниваются только модели, математически определимые на 2023 origins.
 
-- лаги t, t-1, t-2, t-3, t-6, t-12;
-- rolling mean/std/min/max;
-- локальные slopes и относительные изменения;
-- структуру категорий расходов;
-- сезонность origin и target;
-- национальные сигналы СберИндекса и их лаги;
-- high-frequency monthly pulse из недельных категорий.
+Ограничение h=12 является следствием длины данных, а не пропущенным экспериментом.
 
-Для каждой строки с forecast origin t используются только данные на t и ранее.
+## 5. Foundation model
 
-## 4. Extended holdout
+Запущена TimesFM 2.5-200M zero-shot с frozen official Google weights.
 
-На target-window 2024-07 — 2024-12 pooled LightGBM показывает:
+Два заранее заданных варианта:
+- raw levels;
+- log YoY context.
 
-| Горизонт | MAE, руб. | R² | wMAPE |
-|---:|---:|---:|---:|
-| 1 мес | 939 | 0.986 | 2.89% |
-| 3 мес | 1 020 | 0.984 | 3.14% |
-| 6 мес | 1 168 | 0.981 | 3.60% |
-| 12 мес | 1 866 | 0.958 | 5.75% |
+Fine-tuning и tuning под exact не использовались. Point forecast TimesFM хуже V3/V3-hedge на h=1/3/6, но её 80% interval на h=1 ближе к nominal coverage.
 
-Эта проверка полезна для длинных горизонтов, но основной конкурсный benchmark ниже использует точный rolling protocol.
+## 6. Prediction intervals
 
-## 5. Exact contest-window benchmark
+Двухчастный time-safe conformal:
+- idiosyncratic normalized residual;
+- отдельный band общего monthly shock.
 
-Для сопоставимости с публичным конкурсным baseline применяется отдельный rolling-backtest:
+Calibration использует только forecast errors, уже наблюдаемые на текущий origin.
 
-- 2 016 полных муниципальных рядов;
-- origins: 2024-06, 2024-07, 2024-08, 2024-09;
-- горизонты: 1, 2, 3 месяца;
-- 24 192 forecast pairs.
+## 7. Structural shifts
 
-Текущий V2 forecast — equal-weight ансамбль двух интерпретируемых компонентов:
+Операционное событие:
+- panel-relative level shift ≥3 robust sigma;
+- post-level устойчив 3 месяца;
+- исключается 12-месячное seasonal echo;
+- deduplication local maxima ±2 месяца.
 
-1. local_sng2: прошлогодний уровень целевого месяца, скорректированный на средний log YoY-рост последних двух наблюдаемых месяцев;
-2. panel_factor6: текущая log-девиация муниципалитета от медианного общего фактора сохраняется, а общий фактор продвигается по среднему YoY momentum последних шести месяцев.
+Две разные задачи:
+- detection: shift начался 0–2 месяца назад;
+- prediction: shift начнётся через 1–3 месяца.
 
-Финальный прогноз:
+Сравниваются robust jump, BOCPD, PELT, CUSUM, Page-Hinkley и supervised LightGBM. Rolling retraining и embargo исключают использование незрелых labels.
 
-forecast = 0.5 * local_sng2 + 0.5 * panel_factor6
+## 8. News / event signals
 
-Результат:
+Query plan из 95 month×topic запросов зафиксирован до полного сбора. Корпус: 550 search results за 2023-05…2024-11.
 
-- MAE 725.69 руб.;
-- R² level 0.9915;
-- R² growth 0.4274;
-- wMAPE 2.302%.
+Temporal guard:
+- candidate publication dates берутся из metadata и URL;
+- verified publication date = наиболее поздняя достоверная candidate;
+- query-month mismatches и записи без надёжной даты исключаются;
+- rolling sums используют только текущий и прошлые месяцы.
 
-По горизонтам:
+Frozen ablation:
+- forecasting: V3 vs V3 + news residual correction;
+- early warning: base vs base + news.
 
-| Horizon | MAE | R² growth |
-|---:|---:|---:|
-| 1 | 598.35 | 0.578 |
-| 2 | 722.29 | 0.436 |
-| 3 | 856.42 | 0.259 |
+Новости не улучшают финальную систему и поэтому не входят в production forecast.
 
-Основной риск этого результата — короткая история и ограниченное число target months, поэтому до финальной подачи нужно подтвердить устойчивость на дополнительных rolling origins и статистических парных тестах.
+## 9. Проверки качества
 
-## 6. Точки структурных изменений
+- exact / other / apr–nov rolling windows;
+- 5 untouched category panels;
+- horizon benchmark 1/3/6/12;
+- TimesFM / Prophet / simple baselines;
+- ablation;
+- sign test по target months;
+- time-safety perturbation tests;
+- separate news time-safety tests;
+- deterministic real examples including failure case.
 
-Для operational-разметки используется robust level-shift score в log-пространстве. Сравнивается медианный уровень предыдущих месяцев с текущим/следующим уровнем, масштаб задаётся MAD месячных изменений, соседние срабатывания дедуплицируются.
+## 10. Финальные headline metrics
 
-Это не «истинная» разметка шоков, а воспроизводимое определение события для обучения early-warning слоя.
+Exact:
+- V3 MAE 719.87 ₽
+- R² growth 0.4376
+- wMAPE 2.284%
 
-## 7. Early warning
+Structural-shift detection:
+- PR-AUC 0.383
+- base rate 1.82%
+- 82% events detected ≤2 months
+- median delay 1 month
 
-Для каждого origin строится target: произойдёт ли robust structural shift в ближайшие 1–3 месяца.
+News ablation:
+- forecast exact 719.87 → 946.84 ₽
+- detection PR-AUC 0.3682 → 0.3639
+- prediction PR-AUC 0.0245 → 0.0269, but false alarms increase sharply
 
-Текущая LightGBM-классификация на holdout имеет примерно:
+## 11. Воспроизводимость
 
-- PR-AUC 0.525;
-- precision 58.6%;
-- recall 56.5%;
-- F1 0.575;
-- base positive rate около 5.5%.
+./reproduce.sh
 
-Следующий этап должен сравнить CUSUM/Page-Hinkley, BOCPD, PELT и supervised-подход на одинаковом временном протоколе.
-
-## 8. Новости и внешние сигналы
-
-Новости можно добавлять только с publication-time alignment: для forecast origin разрешены публикации, которые реально были доступны не позднее origin.
-
-Предпочтительные признаки:
-
-- event intensity;
-- topic counts;
-- sentiment;
-- source reliability;
-- региональная привязка;
-- агрегированные embeddings/event scores.
-
-Обязателен ablation against no-news model.
-
-## 9. Неопределённость и воспроизводимость
-
-До финальной версии нужно добавить:
-
-- quantile / conformal prediction intervals;
-- несколько rolling folds;
-- bootstrap confidence intervals;
-- paired model comparison;
-- ablation table;
-- фиксированные seed/config;
-- одну команду для воспроизведения exact benchmark.
-
-Главное правило: не принимать улучшение, если оно появляется только на одном удачном окне.
+Собственные модели, horizons, category replication, early warning, news ablation, examples и figures пересчитываются из raw CSV. Prophet / TimesFM могут использовать frozen cached predictions; полный refit documented separately.

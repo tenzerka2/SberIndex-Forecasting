@@ -1,0 +1,14 @@
+model,h,n_pairs,coverage80,mean_width80_rub,note
+v3,1,18144,0.8451,3673.1373,pairs with >= 1000 calibration pairs of target <= origin
+v3,3,14112,0.9561,7432.4050,pairs with >= 1000 calibration pairs of target <= origin
+v3,6,8064,0.9971,13286.1425,pairs with >= 1000 calibration pairs of target <= origin
+v3_hedge,1,18144,0.8143,2850.1169,pairs with >= 1000 calibration pairs of target <= origin
+v3_hedge,3,14112,0.9217,5538.8856,pairs with >= 1000 calibration pairs of target <= origin
+v3_hedge,6,8064,0.9867,9675.1167,pairs with >= 1000 calibration pairs of target <= origin
+timesfm_raw,1,20160,0.8127,5975.0252,"model quantiles q10..q90, zero-shot"
+timesfm_raw,3,16128,0.7434,7301.7414,"model quantiles q10..q90, zero-shot"
+timesfm_raw,6,10080,0.6008,8302.4522,"model quantiles q10..q90, zero-shot"
+timesfm_yoy,1,20160,0.7967,3323.1660,"model quantiles q10..q90, zero-shot"
+timesfm_yoy,3,16128,0.7520,4334.6059,"model quantiles q10..q90, zero-shot"
+timesfm_yoy,6,10080,0.7315,5614.8761,"model quantiles q10..q90, zero-shot"
+timesfm_raw,12,24192,0.2219,6792.9189,"model quantiles q10..q90, zero-shot"

@@ -6,7 +6,11 @@
     "2024-08-01",
     "2024-09-01"
   ],
-  "horizons": [1, 2, 3],
+  "horizons": [
+    1,
+    2,
+    3
+  ],
   "n_pairs": 24192,
   "model": "0.5 * local_sng2 + 0.5 * panel_factor6",
   "MAE": 725.6868352098129,
@@ -38,7 +42,5 @@
       "R2_growth": 0.25888762118857367,
       "wMAPE_pct": 2.65309976504106
     }
-  ],
-  "public_prophet_mae": 1428,
-  "public_reference_ensemble_mae": 762
+  ]
 }

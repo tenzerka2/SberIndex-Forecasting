@@ -21,3 +21,13 @@ outputs/shock_risk_latest.csv
 .DS_Store
 .idea/
 .vscode/
+
+# Large rolling-eval predictions (regenerate with benchmarks/rolling_eval.py)
+outputs/rolling_predictions.csv.gz
+catboost_info/
+outputs/*.log
+
+# Foundation-model checkpoints (download with benchmarks/fetch_timesfm.py)
+models/
+.venv-tsfm/
+data/external/settlements.csv

@@ -1,0 +1,13 @@
+einshape==1.0
+flax==0.12.10
+huggingface_hub==2.1.1
+jax==0.11.2
+jaxlib==0.11.2
+jaxtyping==0.3.11
+numpy==2.5.3
+optax==0.2.8
+orbax-checkpoint==0.12.7
+pandas==3.0.6
+safetensors==0.8.0
+scikit-learn==1.9.1
+timesfm==3.0.2

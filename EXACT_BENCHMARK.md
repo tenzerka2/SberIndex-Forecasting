@@ -1,52 +1,35 @@
-# Exact contest-window benchmark (V2)
+# Exact contest-window benchmark
 
 ## Protocol
 
-- target: `Все категории`, municipal cashless consumer spending
-- 2,016 municipal series with complete history from 2023-01 through 2024-12
-- series identities reconstructed from contiguous row blocks in the raw export, so duplicate municipality names are preserved as distinct series
-- forecast origins: 2024-06, 2024-07, 2024-08, 2024-09
-- horizons: 1, 2, 3 months
-- 24,192 municipality-origin-horizon forecast pairs
-- every forecast uses only observations available at its origin
+- target: `Все категории`, municipal cashless consumer spending (RUB);
+- 2,016 municipal series with complete history 2023-01…2024-12; series identity is reconstructed from the raw export's contiguous (municipality, category) row runs, so the 107 series sharing 43 names stay distinct (`src/sbx/data.py`, `outputs/data_audit.json`);
+- forecast origins 2024-06, 2024-07, 2024-08, 2024-09; horizons 1, 2, 3 months; 24,192 forecast pairs;
+- every forecast uses only data available at its origin (`tests/test_time_safety.py`);
+- metrics: MAE (RUB), R² of levels, R² of log year-over-year growth (base = same month one year earlier), wMAPE.
 
-This protocol matches the public SberIndex forecasting benchmark. As a sanity check, the implementation reproduces published factor-only and seasonal-growth control results on the same data geometry.
+The protocol is intended to mirror the public SberIndex forecasting benchmark. We do not quote public leaderboard or baseline numbers: none of them can be verified from this repository. All comparisons below are on identical pairs computed here.
 
-## V2 forecast
+## Results (reproducible: `./reproduce.sh`, source `FINAL_METRICS.csv`)
 
-The current V2 candidate is an equal-weight ensemble of two deliberately simple, leakage-free components:
+| Model | MAE, RUB | R² level | R² growth | wMAPE |
+|---|---:|---:|---:|---:|
+| seasonal naive | 4,205.64 | 0.8421 | −9.278 | 13.344% |
+| seasonal growth (1 month) | 976.89 | 0.9873 | 0.044 | 3.099% |
+| local_sng2 | 945.61 | 0.9881 | 0.160 | 3.000% |
+| panel factor (6 months) | 1,001.46 | 0.9829 | 0.149 | 3.177% |
+| V2 = 0.5·local_sng2 + 0.5·panel_factor6 | 725.69 | 0.9915 | 0.4274 | 2.302% |
+| **V3 = V2 + error feedback** (benchmark model) | **719.87** | **0.9917** | **0.4376** | **2.284%** |
+| V3-hedge (production model) | 730.14 | 0.9917 | 0.4320 | 2.317% |
 
-1. **Local seasonal-growth component (`sng2`)**: last-year level for the target month multiplied by the municipality's mean log year-over-year growth over the last two observed months.
-2. **Panel common-factor component (`factor6`)**: the municipality's current log-deviation from the cross-sectional median is held fixed, while the median panel path advances using its mean log year-over-year growth over the last six observed months.
+By horizon (V2 → V3): h=1 598.35 → 592.86, h=2 722.29 → 716.98, h=3 856.42 → 849.76 RUB.
 
-Final prediction:
+`python benchmarks/exact_backtest.py` reproduces V2 alone (MAE 725.686835) with the original script; `benchmarks/rolling_eval.py` asserts the same value before computing anything else.
 
-`forecast = 0.5 * sng2 + 0.5 * factor6`
+Prophet, on a fixed random sample of 400 series and the same pairs (`exact_sample400` rows of `FINAL_METRICS.csv`): default settings 20,997.7 RUB (unstable with < 2 years of history), log target 1,627.1 RUB; V2 699.2 and V3 694.1 RUB on the same sample.
 
-The two components have different error structure: the local model reacts to municipality-specific momentum, while the panel model shrinks short-series noise toward a common trajectory. Their equal-weight average lowers MAE without fitting ensemble weights.
+## How much to trust this window
 
-## Results
-
-- **MAE:** 725.69 RUB/month
-- **R² level:** 0.9915
-- **R² year-over-year growth:** 0.4274
-- **wMAPE:** 2.302%
-
-By horizon:
-
-| Horizon | MAE, RUB | R² growth |
-|---:|---:|---:|
-| 1 month | 598.35 | 0.578 |
-| 2 months | 722.29 | 0.436 |
-| 3 months | 856.42 | 0.259 |
-
-Public reference values on the same protocol:
-
-- Prophet contest baseline: ~1,428 RUB MAE
-- published three-model ensemble: ~762 RUB MAE, R² growth ~0.42
-
-Therefore V2 is approximately 49% lower MAE than Prophet and approximately 4.8% lower MAE than the published 762-RUB ensemble on this backtest window.
-
-## Important methodological note
-
-The contest history is only 24 months, so model-selection uncertainty is material. The V2 equal-weight ensemble is intentionally simple and reproducible. Before final submission, add sensitivity checks across alternative origin windows and bootstrap results by target month; do not claim universal superiority beyond the tested contest window.
+- 6 target months. V3 beats V2 in 6 of 6 (one-sided sign test p = 0.016); differences of ±30 RUB between other strong models are not significant month-wise.
+- V2's settings are favourable to this window: of 175 nearby configurations, 8 beat V2 here but 84 beat it on origins 2024-04, 05, 10, 11 (`outputs/v2_grid.csv`).
+- Robustness evidence (other origins, five untouched category panels) is in `FINAL_REPORT.md`, sections 4.2–4.3.

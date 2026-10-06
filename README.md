@@ -1,52 +1,64 @@
-# SberIndex Forecasting v2
+# SberIndex Forecasting — final submission
 
-Воспроизводимая конкурсная версия решения задачи прогнозирования потребительских безналичных расходов на уровне муниципальных образований и раннего предупреждения структурных изменений.
+Прогноз безналичных потребительских расходов 2 016 муниципальных образований, structural-shift detection и исследование внешних сигналов.
 
-## Текущий результат
+## Главный результат
 
-На точном конкурсном rolling-backtest:
+- V3 exact MAE: **719.87 ₽**
+- R² growth: **0.4376**
+- wMAPE: **2.284%**
+- V3 лучше V2 во всех 5 категориальных панелях, не использованных при выборе модели
+- detection structural shifts: PR-AUC **0.383** при base rate 1.82%, median delay 1 месяц
 
-- 2 016 полных муниципальных рядов;
-- origins: 2024-06, 2024-07, 2024-08, 2024-09;
-- горизонты: 1, 2, 3 месяца;
-- 24 192 forecast pairs;
-- **MAE 725.69 руб.**;
-- **R² growth 0.4274**;
-- **wMAPE 2.302%**.
+## Что дополнительно проверено
 
-Текущий прогноз — интерпретируемый equal-weight ансамбль локальной динамики муниципалитета и общего панельного фактора.
+- horizons **1 / 3 / 6 / 12**
+- **TimesFM 2.5-200M** zero-shot
+- Prophet sample benchmark
+- 5 category panels
+- national / weekly SberIndex signals
+- historical news/events: **95 pre-registered queries, 550 articles**
+- conformal intervals
+- deterministic stable / shift / failure municipality examples
+- time-safety / leakage tests
 
-## Быстрый запуск
+Новости и TimesFM не улучшают point forecast V3; отрицательные результаты сохранены в ablation и используются в выводах.
+
+## Документы подачи
+
+- FINAL_REPORT.md — полный отчёт
+- METHOD.md — методология
+- PRESENTATION.md — финальные 10 слайдов + appendix
+- PRESENTATION_DATA.md — source map каждой цифры
+- JURY_QA.md — 25 вопросов жюри
+- RUBRIC_CHECKLIST.md — критерий → доказательство
+- REAL_EXAMPLES.md — реальные примеры МО
+- FINAL_SUBMISSION_STATUS.md — что отправлять
+
+## Воспроизведение
 
 ```bash
 python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
-mkdir -p data/raw
-# распакуйте исходные CSV СберИндекса в data/raw/
-python src/pipeline.py
-python benchmarks/exact_backtest.py
+# распаковать 5 CSV СберИндекса в data/raw/
+./reproduce.sh
 ```
 
-## Структура
+reproduce.sh пересчитывает собственные forecasting results, horizon benchmark, category replication, early warning, news ablation, real examples и figures. Prophet / TimesFM могут использовать frozen cached predictions; отдельный refit описан в benchmark scripts.
 
-- `src/pipeline.py` — основной forecasting + early-warning pipeline;
-- `benchmarks/exact_backtest.py` — точный конкурсный rolling-backtest;
-- `METHOD.md` — методология;
-- `EXACT_BENCHMARK.md` — протокол и результаты exact benchmark;
-- `FABLE_TASK.md` — техническое задание на независимый аудит и следующую итерацию;
-- `outputs/` — компактные метрики и summaries;
-- `report.html` — первая версия отчёта.
+## Основные файлы
 
-## Важное про данные
+- src/sbx/data.py — reconstruction 2 016 series
+- src/sbx/models.py / final.py — V2, V3, V3-hedge
+- src/sbx/intervals.py — time-safe conformal
+- src/sbx/early_warning.py / ew_features.py — shifts / detectors
+- src/sbx/news_global.py — verified publication-time news features
+- benchmarks/horizons_benchmark.py — 1/3/6/12
+- benchmarks/foundation_timesfm.py — TimesFM
+- benchmarks/news_ablation_global.py — no-news vs news
+- benchmarks/real_examples.py — deterministic examples
+- tests/test_time_safety.py
+- tests/test_news_time_safety.py
 
-Исходные конкурсные CSV не коммитятся в репозиторий. Положите их в `data/raw/`. Ожидаемые имена описаны в `data/README.md`.
-
-## Следующие цели
-
-1. Независимо воспроизвести MAE 725.69 без leakage.
-2. Проверить результат на дополнительных rolling origins.
-3. Попробовать снизить MAE ниже 700 руб. только time-safe методами.
-4. Усилить early-warning structural change detector.
-5. Добавить news/event признаки со строгим publication-time alignment.
-6. Добавить uncertainty intervals и ablation-анализ.
+Исходные муниципальные CSV не коммитятся. Стабильного id МО в экспорте нет; технический ключ полного ряда — run_id raw export.
