@@ -27,6 +27,7 @@ $PY benchmarks/news_ablation_global.py > outputs/news_ablation.log
 $PY benchmarks/forecast_final.py > outputs/forecast_final.log
 $PY benchmarks/real_examples.py > outputs/real_examples.log
 $PY benchmarks/build_final.py > outputs/build_final.log
+$PY benchmarks/finalize_submission.py > outputs/finalize_submission.log
 
 $PY tests/check_presentation_numbers.py
 $PY tests/check_final_additions.py
