@@ -10,7 +10,7 @@
 - 24,192 municipality-origin-horizon forecast pairs
 - every forecast uses only observations available at its origin
 
-This protocol matches the public SberIndex forecasting benchmark. As a sanity check, the implementation reproduces published factor-only and seasonal-growth control results on the same data geometry.
+This protocol is intended to match the public SberIndex forecasting benchmark. NOTE (audit 2026-10): the repository contains no evidence that published factor-only or seasonal-growth control numbers are reproduced; treat that statement as unverified.
 
 ## V2 forecast
 
@@ -40,12 +40,12 @@ By horizon:
 | 2 months | 722.29 | 0.436 |
 | 3 months | 856.42 | 0.259 |
 
-Public reference values on the same protocol:
+Public reference values on the same protocol (quoted, NOT verified in this repository):
 
 - Prophet contest baseline: ~1,428 RUB MAE
 - published three-model ensemble: ~762 RUB MAE, R² growth ~0.42
 
-Therefore V2 is approximately 49% lower MAE than Prophet and approximately 4.8% lower MAE than the published 762-RUB ensemble on this backtest window.
+If those quoted values are on identical pairs, V2 is ~49% below Prophet and ~4.8% below the 762-RUB ensemble. Our own Prophet on a 400-series sample of the same pairs: 1,627 RUB (log target) vs 699 RUB for V2.
 
 ## Important methodological note
 
@@ -69,3 +69,5 @@ Caveats found in the audit (details in `REPORT.md`):
 - The window has 6 target months. Bootstrap over target months gives a 95% CI of [−34, +32] RUB for V3-hedge minus V2, i.e. differences of this size are not significant.
 - Prophet with default settings is unstable on < 2 years of history (MAE ~21k RUB on a 400-series sample); a log-target Prophet gives 1,627 RUB on the same pairs (V2: 699).
 - MAE < 700 RUB was not reached by any time-safe method.
+
+Final models, replication on the five category panels and the review of remaining risks: `FINAL_REPORT.md`.

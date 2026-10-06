@@ -1,47 +1,39 @@
-# SberIndex Forecasting v3
+# SberIndex Forecasting v3 (final)
 
-Воспроизводимое конкурсное решение: прогноз потребительских безналичных расходов на уровне муниципальных образований и раннее обнаружение структурных изменений. Полный отчёт аудита и итерации: [`REPORT.md`](REPORT.md).
+Прогноз потребительских безналичных расходов 2 016 муниципальных образований на 1–3 месяца и обнаружение структурных сдвигов. Главный документ: [`FINAL_REPORT.md`](FINAL_REPORT.md) (метод, результаты, ablation, review, ограничения, структура презентации).
 
-## Текущий результат
+## Финальные модели (заморожены в `src/sbx/final.py`)
 
-Exact contest benchmark: 2 016 муниципальных рядов, origins 2024-06…2024-09, горизонты 1–3, 24 192 пары.
+| Модель | Роль | MAE exact | R² growth | wMAPE | MAE other origins | Категорий лучше V2 (апр–ноя) |
+|---|---|---:|---:|---:|---:|---:|
+| V2 (прежняя) | reference | 725.69 | 0.4274 | 2.302% | 925.1 | |
+| **V3** = V2 + error feedback | benchmark | **719.87** | **0.4376** | **2.284%** | 921.7 | 5 из 5 |
+| **V3-hedge** = хедж общего роста + error feedback | production | 730.14 | 0.4320 | 2.317% | **793.0** | 4 из 5 |
 
-| Модель | MAE, ₽ | R² growth | wMAPE | MAE на других origins (04, 05, 10, 11) |
-|---|---:|---:|---:|---:|
-| V2: 0.5·local_sng2 + 0.5·panel_factor6 | 725.69 | 0.4274 | 2.302% | 925.1 |
-| **V3: V2 + error feedback** | **719.87** | **0.4376** | **2.284%** | 921.7 |
-| V3-hedge: хедж общего роста + error feedback | 730.14 | 0.4320 | 2.317% | **793.0** |
+Exact protocol: origins 2024-06…2024-09, h = 1–3, 24 192 пары. Other: origins 2024-04, 05, 10, 11.
 
-V3 лучше V2 во всех 6 целевых месяцах exact-окна (ΔMAE −5.8 ₽, 95% CI [−7.5; −3.5] по месяцам) и на дополнительных origins. V3-hedge рекомендуется для реального прогноза: V2 опирается на окно общего роста, которое захватывает аномалию I квартала в муниципальных данных, и на других origins проигрывает 130 ₽.
+Early warning: детекция уже начавшегося сдвига PR-AUC 0.38 при частоте 1.8% (82% сдвигов за ≤ 2 месяца, 2.1 ложной тревоги на 100 ряд-месяцев). Упреждение за 1–3 месяца не работает (lift ≤ 2.5×), недельные и национальные данные раннего сигнала не дают.
 
-## Быстрый запуск
+## Воспроизведение одной командой
 
 ```bash
-python -m venv .venv
-source .venv/bin/activate
+python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
-mkdir -p data/raw
-# распакуйте исходные CSV СберИндекса в data/raw/
-python benchmarks/exact_backtest.py       # V2 exact benchmark (725.686835)
-python benchmarks/rolling_eval.py         # все модели, 10 origins, ablation, bootstrap, интервалы
-python benchmarks/early_warning_eval.py   # structural-change detectors + supervised classifier
-python tests/test_time_safety.py          # perturbation-тест на отсутствие утечки
-python src/pipeline.py                    # pooled LightGBM на длинных горизонтах + early warning
+mkdir -p data/raw   # распакуйте 5 исходных CSV СберИндекса (маски в data/README.md)
+./reproduce.sh      # ~7 минут
 ```
+
+Результат: `FINAL_METRICS.csv`, `ABLATION.csv`, `figures/`, `outputs/final_forecasts_2025.csv.gz` (обе модели, h = 1–12, интервалы 80/90%), промежуточные таблицы в `outputs/`.
 
 ## Структура
 
-- `src/sbx/data.py`: загрузка, восстановление идентичности рядов (омонимы МО), внешние ряды с publication-time alignment;
-- `src/sbx/backtest.py`: rolling-origin движок, метрики, paired bootstrap по рядам и целевым месяцам;
-- `src/sbx/models.py`: baselines, V2, V3 (error feedback), варианты общего фактора, обучаемые веса, SVD, pooled/residual GBM;
-- `src/sbx/intervals.py`: time-safe двухчастные conformal-интервалы;
-- `src/sbx/early_warning.py`: определение структурного сдвига, CUSUM, Page-Hinkley, BOCPD, PELT, признаки классификатора;
-- `benchmarks/`: exact benchmark, полная rolling-оценка, early-warning оценка, Prophet (кэш на выборке);
-- `src/pipeline.py`: pooled LightGBM для горизонтов 1/3/6/12 и operational early warning;
-- `tests/test_time_safety.py`: все прогнозы не меняются при порче данных после origin;
-- `outputs/`: метрики, ablation, bootstrap, интервалы, early-warning таблицы;
-- `METHOD.md`, `EXACT_BENCHMARK.md`, `REPORT.md`: методология, протокол, отчёт.
+- `src/sbx/data.py`: восстановление рядов по блокам (МО, категория) сырого экспорта с проверками, национальные и недельные ряды;
+- `src/sbx/models.py`, `src/sbx/final.py`: все модели и замороженные финальные;
+- `src/sbx/backtest.py`: rolling-origin движок, метрики, bootstrap и sign test;
+- `src/sbx/intervals.py`: двухчастные conformal-интервалы;
+- `src/sbx/early_warning.py`, `src/sbx/ew_features.py`: определение сдвига, детекторы, признаки;
+- `benchmarks/`: `exact_backtest.py` (V2, 725.686835), `rolling_eval.py`, `category_replication.py`, `early_warning_eval.py`, `early_warning_v2.py`, `forecast_final.py`, `build_final.py`, `prophet_baseline.py`;
+- `tests/test_time_safety.py`: 7 тестов на утечку и реконструкцию;
+- `src/pipeline.py`: legacy pooled LightGBM для h = 1/3/6/12 (на 1 904 рядах без омонимов, не сопоставим с exact).
 
-## Важное про данные
-
-Исходные конкурсные CSV не коммитятся. Положите их в `data/raw/`, маски имён в `data/README.md`. В муниципальном CSV нет стабильного id; ряды восстанавливаются по непрерывным блокам (МО, категория) сырого экспорта, загрузчик проверяет результат assert'ами.
+Исходные CSV не коммитятся. Стабильного id МО нет: ключ ряда это `run_id` выгрузки; у омонимов совпадают названия.

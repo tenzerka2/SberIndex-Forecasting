@@ -1,0 +1,45 @@
+block,model,description,MAE_exact,MAE_other,MAE_apr_nov,R2_growth_exact,wMAPE_exact,dMAE_vs_V2_exact,dMAE_vs_V2_other,categories_better_than_V2_apr_nov,median_dMAE_pct_categories_apr_nov,PR_AUC,lift_vs_base_rate,F1,precision,recall,false_alarms_per_100,detected_share,median_delay_months
+forecast,seasonal_naive,last-year level only,4205.6410,4509.1378,4335.7110,-9.2779,13.3436,3479.9541,3584.0152,,,,,,,,,,
+forecast,seasonal_growth1,+ own YoY of last month,976.8905,963.8769,971.3132,0.0443,3.0995,251.2037,38.7543,,,,,,,,,,
+forecast,local_sng2,own YoY averaged over 2 months,945.6059,924.8038,936.6907,0.1596,3.0002,219.9191,-0.3188,,,,,,,,,,
+forecast,factor_only6,panel factor only (6m common momentum),1001.4574,1431.4739,1185.7502,0.1490,3.1774,275.7706,506.3513,,,,,,,,,,
+forecast,v2_ensemble,V2: 0.5 local_sng2 + 0.5 factor6,725.6868,925.1226,811.1593,0.4274,2.3024,0.0000,0.0000,,,,,,,,,,
+forecast,horizon_weights,V2 + horizon weights learned on past origins,760.4012,844.5045,796.4454,0.3875,2.4126,34.7143,-80.6181,,,,,,,,,,
+forecast,common_g2,V2 with 2m common momentum in both parts,773.6227,826.1777,796.1463,0.3910,2.4545,47.9359,-98.9449,,,,,,,,,,
+forecast,common_adaptive,V2 with adaptively chosen common window,781.6004,879.1332,823.4002,0.3793,2.4798,55.9136,-45.9893,,,,,,,,,,
+forecast,v3_ef_lag1,V2 + error feedback (1 lag),723.4906,922.2962,808.6930,0.4312,2.2955,-2.1962,-2.8263,,,,,,,,,,
+forecast,v3,V3 = V2 + error feedback (2 lags)  [final benchmark],719.8702,921.6662,806.3542,0.4376,2.2840,-5.8166,-3.4564,5/5,-0.3117,,,,,,,,
+forecast,v3_ef_adaptive_common,V2 + adaptive common + error feedback,776.4727,879.9631,820.8257,0.3909,2.4636,50.7859,-45.1595,,,,,,,,,,
+forecast,common_national2,"V2, panel part advanced by national 2m YoY",745.6538,765.9863,754.3677,0.4120,2.3658,19.9670,-159.1362,0/5,11.1837,,,,,,,,
+forecast,ef_common_national2,national common + error feedback,740.7234,767.6678,752.2710,0.4239,2.3502,15.0366,-157.4548,,,,,,,,,,
+forecast,common_weekly2,"V2, panel part advanced by weekly national category YoY",719.3755,757.7226,735.8100,0.4314,2.2824,-6.3113,-167.4000,0/5,6.2335,,,,,,,,
+forecast,v3_hedge_no_ef,"V2, panel part advanced by hedge {muni 6m, muni 2m, national 2m}",735.0156,792.5349,759.6667,0.4209,2.3320,9.3288,-132.5877,3/5,-2.4545,,,,,,,,
+forecast,v3_hedge,V3-hedge = hedge + error feedback  [final robust],730.1427,792.9834,757.0744,0.4320,2.3166,4.4558,-132.1392,4/5,-2.8741,,,,,,,,
+forecast,residual_lgbm,V2 + LightGBM residual,846.9790,1073.6690,944.1319,0.2971,2.6873,121.2922,148.5465,,,,,,,,,,
+forecast,residual_catboost,V2 + CatBoost residual,833.2542,1024.4467,915.1938,0.3208,2.6437,107.5673,99.3241,,,,,,,,,,
+forecast,pooled_lgbm_direct,"pooled LightGBM, direct YoY target",798.7565,1136.9934,943.7152,0.3656,2.5343,73.0697,211.8708,,,,,,,,,,
+forecast,lowrank_factor4,rank-4 SVD factor model,884.1216,892.8983,887.8830,0.3214,2.8051,158.4347,-32.2243,,,,,,,,,,
+early_warning_detect,sup_base,LightGBM on total-series detectors + state,,,,,,,,,,0.3833,21.1131,0.4085,0.3232,0.5546,2.1081,0.8208,1.0000
+early_warning_detect,sup_base_category,+ municipal category features,,,,,,,,,,0.3372,18.5735,0.4020,0.3208,0.5383,2.0685,0.8113,1.0000
+early_warning_detect,sup_base_national,+ national monthly signals,,,,,,,,,,0.3660,20.1603,0.3916,0.3087,0.5355,2.1776,0.8019,1.0000
+early_warning_detect,sup_base_weekly,+ weekly national category signals,,,,,,,,,,0.3687,20.3075,0.4016,0.3213,0.5355,2.0536,0.8208,1.0000
+early_warning_detect,sup_all,all feature groups,,,,,,,,,,0.3507,19.3169,0.4149,0.3468,0.5164,1.7659,0.8113,1.0000
+early_warning_detect,sup_category_only,category features only,,,,,,,,,,0.0311,1.7127,0.0550,0.0315,0.2158,12.0437,0.4434,0.0000
+early_warning_detect,jump_raw,unsupervised detector,,,,,,,,,,0.3422,18.8496,0.3996,0.3259,0.5164,1.9395,0.7170,0.0000
+early_warning_detect,bocpd,unsupervised detector,,,,,,,,,,0.2948,16.2370,0.3580,0.3178,0.4098,1.5972,0.6509,0.0000
+early_warning_detect,pelt,unsupervised detector,,,,,,,,,,0.2655,14.6223,0.4017,0.4103,0.3934,1.0268,0.6981,1.0000
+early_warning_detect,cusum,unsupervised detector,,,,,,,,,,0.0425,2.3434,0.0869,0.0515,0.2787,9.3254,0.4434,0.0000
+early_warning_detect,page_hinkley,unsupervised detector,,,,,,,,,,0.0344,1.8964,0.0665,0.0353,0.5820,28.9087,0.7830,0.0000
+early_warning_detect,cat_jump_max,unsupervised detector,,,,,,,,,,0.0448,2.4694,0.0811,0.0474,0.2814,10.2679,0.4906,0.0000
+early_warning_predict,sup_base,LightGBM on total-series detectors + state,,,,,,,,,,0.0258,1.8559,0.0431,0.0275,0.1000,4.9206,,
+early_warning_predict,sup_base_category,+ municipal category features,,,,,,,,,,0.0229,1.6472,0.0336,0.0186,0.1786,13.1052,,
+early_warning_predict,sup_base_national,+ national monthly signals,,,,,,,,,,0.0290,2.0891,0.0480,0.0291,0.1357,6.2798,,
+early_warning_predict,sup_base_weekly,+ weekly national category signals,,,,,,,,,,0.0274,1.9734,0.0470,0.0301,0.1071,4.7917,,
+early_warning_predict,sup_all,all feature groups,,,,,,,,,,0.0274,1.9744,0.0460,0.0268,0.1643,8.2937,,
+early_warning_predict,sup_category_only,category features only,,,,,,,,,,0.0150,1.0792,0.0300,0.0154,0.5357,47.5099,,
+early_warning_predict,jump_raw,unsupervised detector,,,,,,,,,,0.0347,2.4969,0.0832,0.0599,0.1357,2.9563,,
+early_warning_predict,bocpd,unsupervised detector,,,,,,,,,,0.0352,2.5320,0.0644,0.0389,0.1857,6.3690,,
+early_warning_predict,pelt,unsupervised detector,,,,,,,,,,0.0191,1.3736,0.0392,0.0323,0.0500,2.0833,,
+early_warning_predict,cusum,unsupervised detector,,,,,,,,,,0.0192,1.3840,0.0158,0.0101,0.0357,4.8413,,
+early_warning_predict,page_hinkley,unsupervised detector,,,,,,,,,,0.0164,1.1803,0.0340,0.0174,0.7500,58.9286,,
+early_warning_predict,cat_jump_max,unsupervised detector,,,,,,,,,,0.0173,1.2463,0.0341,0.0192,0.1500,10.6151,,
