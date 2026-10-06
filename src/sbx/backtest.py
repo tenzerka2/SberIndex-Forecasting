@@ -69,11 +69,16 @@ def table(df: pd.DataFrame, cols, by=None) -> pd.DataFrame:
 
 
 def block_bootstrap_diff(df: pd.DataFrame, a: str, b: str, n_boot: int = 2000, seed: int = 0) -> dict:
-    """Paired bootstrap of MAE(a) - MAE(b).
+    """Paired comparison of MAE(a) - MAE(b) (negative = a better).
 
-    Two resampling schemes: by series (municipalities) and by target month (the dominant source
-    of dependence: all series share the same macro shock in a given month).
+    * percentile bootstrap by series and by target month (all series share the macro shock of a
+      month, so the month is the dominant unit of dependence). With only 6-8 target months the
+      month bootstrap is anti-conservative; treat its CI as optimistic.
+    * exact one-sided sign test over target months (H0: a and b equally likely to win a month),
+      the most defensible statement with so few clusters.
     """
+    from scipy.stats import binomtest
+
     rng = np.random.default_rng(seed)
     d = (df[a] - df["y"]).abs() - (df[b] - df["y"]).abs()
     out = {"diff": float(d.mean())}
@@ -83,7 +88,11 @@ def block_bootstrap_diff(df: pd.DataFrame, a: str, b: str, n_boot: int = 2000, s
         idx = rng.integers(0, len(s), size=(n_boot, len(s)))
         bs = s[idx].sum(1) / c[idx].sum(1)
         out[f"ci95_by_{unit}"] = [float(np.quantile(bs, 0.025)), float(np.quantile(bs, 0.975))]
-        out[f"p_le0_by_{unit}"] = float((bs >= 0).mean()) if out["diff"] < 0 else float((bs <= 0).mean())
-    out["months_better"] = int((d.groupby(df["target_date"]).mean() < 0).sum())
-    out["months_total"] = int(df["target_date"].nunique())
+        # share of bootstrap replicates on the other side of zero (one-sided bootstrap p-value)
+        out[f"p_boot_by_{unit}"] = float((bs >= 0).mean()) if out["diff"] < 0 else float((bs <= 0).mean())
+    per_month = d.groupby(df["target_date"]).mean()
+    wins, n = int((per_month < 0).sum()), int(len(per_month))
+    out["months_better"], out["months_total"] = wins, n
+    out["sign_test_p_one_sided"] = float(binomtest(wins, n, 0.5, alternative="greater").pvalue) if out["diff"] < 0 \
+        else float(binomtest(n - wins, n, 0.5, alternative="greater").pvalue)
     return out

@@ -30,8 +30,7 @@ def series_scale(L: np.ndarray, T: int) -> np.ndarray:
     return robust_sigma(rel_level(L[:, : T + 1]))
 
 
-def conformal(df: pd.DataFrame, col: str, L: np.ndarray, periods: pd.DatetimeIndex,
-              levels=(0.8, 0.9)) -> pd.DataFrame:
+def _prepare(df: pd.DataFrame, col: str, L: np.ndarray, periods: pd.DatetimeIndex) -> pd.DataFrame:
     out = df.copy()
     idx = {p: i for i, p in enumerate(periods)}
     T_of = out["origin"].map(idx)
@@ -40,25 +39,64 @@ def conformal(df: pd.DataFrame, col: str, L: np.ndarray, periods: pd.DatetimeInd
     lerr = np.log(out["y"] / out[col])
     out["_c"] = lerr.groupby([out["origin"], out["h"]]).transform("median")
     out["_z"] = (lerr - out["_c"]) / out["_s"]
+    return out
+
+
+def calibrate(calib: pd.DataFrame, origin: pd.Timestamp, h: int, levels=(0.8, 0.9)) -> dict | None:
+    """Half-width ingredients for (origin, h) from a prepared calibration frame.
+
+    Uses only pairs with target_date <= origin, horizon <= h, target in the last 4 months.
+    Returns {level: (q_idio, z_common * sigma_common * sqrt(h))} or None if too few pairs.
+    """
+    past = calib[(calib["target_date"] <= origin) & (calib["h"] <= h)]
+    recent = past[past["target_date"] > origin - pd.DateOffset(months=IDIO_WINDOW_MONTHS)]
+    if len(recent) < 1000:
+        return None
+    zabs = np.abs(recent["_z"]) * np.sqrt(h / recent["h"])
+    common = recent.groupby(["origin", "h"])["_c"].first()
+    sig_c = 1.4826 * np.median(np.abs(common.to_numpy() / np.sqrt(common.index.get_level_values("h"))))
+    return {lv: (float(np.quantile(zabs, lv)), float(norm.ppf(0.5 + lv / 2) * sig_c * np.sqrt(h))) for lv in levels}
+
+
+def conformal(df: pd.DataFrame, col: str, L: np.ndarray, periods: pd.DatetimeIndex,
+              levels=(0.8, 0.9)) -> pd.DataFrame:
+    out = _prepare(df, col, L, periods)
     for origin in sorted(out["origin"].unique()):
         cur_o = out["origin"] == origin
         for h in sorted(out.loc[cur_o, "h"].unique()):
             m = cur_o & (out["h"] == h)
-            past = out[(out["target_date"] <= origin) & (out["h"] <= h)]
-            recent = past[past["target_date"] > origin - pd.DateOffset(months=IDIO_WINDOW_MONTHS)]
-            if len(recent) < 1000:
-                for lv in levels:
-                    out.loc[m, [f"{col}_lo{int(lv*100)}", f"{col}_hi{int(lv*100)}"]] = np.nan
-                continue
-            zabs = np.abs(recent["_z"]) * np.sqrt(h / recent["h"])
-            common = recent.groupby(["origin", "h"])["_c"].first()
-            sig_c = 1.4826 * np.median(np.abs(common.to_numpy() / np.sqrt(common.index.get_level_values("h"))))
-            s = out.loc[m, "_s"]
+            cal = calibrate(out, origin, h, levels)
             for lv in levels:
-                hw = np.sqrt((np.quantile(zabs, lv) * s) ** 2 + (norm.ppf(0.5 + lv / 2) * sig_c * np.sqrt(h)) ** 2)
-                out.loc[m, f"{col}_lo{int(lv*100)}"] = out.loc[m, col] * np.exp(-hw)
-                out.loc[m, f"{col}_hi{int(lv*100)}"] = out.loc[m, col] * np.exp(hw)
+                lo, hi = f"{col}_lo{int(lv*100)}", f"{col}_hi{int(lv*100)}"
+                if cal is None:
+                    out.loc[m, [lo, hi]] = np.nan
+                    continue
+                q, c = cal[lv]
+                hw = np.sqrt((q * out.loc[m, "_s"]) ** 2 + c ** 2)
+                out.loc[m, lo] = out.loc[m, col] * np.exp(-hw)
+                out.loc[m, hi] = out.loc[m, col] * np.exp(hw)
     return out.drop(columns=[c for c in out.columns if c.startswith("_")])
+
+
+def future_intervals(calib_df: pd.DataFrame, col: str, fut: pd.DataFrame, L: np.ndarray,
+                     periods: pd.DatetimeIndex, levels=(0.8, 0.9)) -> pd.DataFrame:
+    """Intervals for genuine out-of-sample forecasts `fut` (series, origin, h, <col>) using the
+    backtest frame `calib_df` (with outcomes) as calibration. Horizons beyond those in the
+    calibration frame borrow shorter horizons scaled by sqrt(h / h') (an assumption, not tested)."""
+    calib = _prepare(calib_df, col, L, periods)
+    out = fut.copy()
+    origin = out["origin"].iloc[0]
+    T = {p: i for i, p in enumerate(periods)}[origin]
+    s = series_scale(L, T)[out["series"].to_numpy()]
+    for h in sorted(out["h"].unique()):
+        m = (out["h"] == h).to_numpy()
+        cal = calibrate(calib, origin, int(h), levels)
+        for lv in levels:
+            q, c = cal[lv]
+            hw = np.sqrt((q * s[m]) ** 2 + c ** 2)
+            out.loc[m, f"{col}_lo{int(lv*100)}"] = out.loc[m, col].to_numpy() * np.exp(-hw)
+            out.loc[m, f"{col}_hi{int(lv*100)}"] = out.loc[m, col].to_numpy() * np.exp(hw)
+    return out
 
 
 def interval_metrics(df: pd.DataFrame, col: str, levels=(0.8, 0.9)) -> list[dict]:

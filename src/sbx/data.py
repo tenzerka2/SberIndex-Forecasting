@@ -71,15 +71,17 @@ def load_panel(category: str = TOTAL, check: bool = True) -> Panel:
     full["homonym"] = full["mo"].duplicated(keep=False)
     full = full.reset_index()[["run_id", "mo", "homonym"]]
 
-    if check and category == TOTAL:
-        # Legacy reconstruction (filter first, then label contiguous name blocks) must give the
-        # same row set; if this ever fails the export ordering changed and must be re-audited.
-        a = df[df["category_15"].eq(category)].reset_index()
-        a["blk"] = (a["mo"] != a["mo"].shift()).cumsum()
-        assert a.groupby("blk")["run_id"].nunique().max() == 1, "homonym blocks merged"
+    if check:
         assert len(full) == 2016, f"expected 2016 complete series, got {len(full)}"
         assert not wide.duplicated().any(), "two reconstructed series are identical"
         assert np.isfinite(wide.values).all() and (wide.values > 0).all()
+        if category == TOTAL:
+            # The exact benchmark was built with the legacy reconstruction (filter first, then
+            # contiguous name blocks). For the total category it gives the same row set; for
+            # "Здоровье" and "Продовольствие" it would merge one homonym pair each (2014 series).
+            a = df[df["category_15"].eq(category)].reset_index()
+            a["blk"] = (a["mo"] != a["mo"].shift()).cumsum()
+            assert a.groupby("blk")["run_id"].nunique().max() == 1, "legacy reconstruction merges homonyms"
 
     periods = pd.DatetimeIndex(wide.columns)
     assert len(periods) == N_MONTHS and periods[0] == START
@@ -122,3 +124,30 @@ def weekly_pulse() -> pd.DataFrame:
     assert (w["period"].dt.dayofweek == 6).all(), "weekly dates are expected to be week-ending Sundays"
     w["month"] = w["period"].dt.to_period("M").dt.to_timestamp()
     return w.groupby("month")["value"].agg(pulse_mean="mean", pulse_median="median", pulse_std="std")
+
+
+def weekly_monthly() -> pd.DataFrame:
+    """Weekly category YoY (%) aggregated to months: one row per month, columns per category plus
+    cross-category summaries. A week belongs to the month of its ending Sunday, so month t only
+    contains weeks that ended inside t (no look-ahead into t+1).
+
+    Columns: <category> (mean weekly YoY in the month), last_<category> (last week of the month),
+    w_mean / w_median / w_disp (cross-category mean, median, std of monthly means),
+    w_last_minus_mean (intra-month momentum: last-week mean minus month mean), n_weeks.
+    """
+    w = pd.read_csv(find("ver-izmenenie-trat-po-kategoriyam*.csv"), sep=";")
+    w["period"] = pd.to_datetime(w["period"])
+    assert (w["period"].dt.dayofweek == 6).all()
+    w["month"] = w["period"].dt.to_period("M").dt.to_timestamp()
+    mean = w.pivot_table(index="month", columns="category", values="value", aggfunc="mean")
+    last = w.sort_values("period").groupby(["month", "category"])["value"].last().unstack()
+    out = mean.copy()
+    out.columns = [f"wk_{c}" for c in mean.columns]
+    for c in last.columns:
+        out[f"wklast_{c}"] = last[c]
+    out["w_mean"] = mean.mean(axis=1)
+    out["w_median"] = mean.median(axis=1)
+    out["w_disp"] = mean.std(axis=1)
+    out["w_last_minus_mean"] = last.mean(axis=1) - mean.mean(axis=1)
+    out["n_weeks"] = w.groupby("month")["period"].nunique()
+    return out.sort_index()

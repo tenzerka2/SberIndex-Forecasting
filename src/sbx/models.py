@@ -114,8 +114,9 @@ def ctx_at(ctx: dict | None, T: int, o: int) -> dict | None:
 
     origin = ctx["origin"] - pd.DateOffset(months=T - o)
     out = {"origin": origin}
-    if "national" in ctx:
-        out["national"] = ctx["national"][ctx["national"].index <= origin]
+    for k, v in ctx.items():
+        if k != "origin" and hasattr(v, "index"):
+            out[k] = v[v.index <= origin]
     return out
 
 
@@ -191,6 +192,18 @@ def g_national(k: int = 2):
         yoy = (s - s.shift(12)).dropna()
         yoy = yoy[yoy.index <= ctx["origin"]]
         return float(yoy.iloc[-k:].mean())
+
+    return g
+
+
+def g_weekly(k: int = 2):
+    """Common YoY from weekly national category data (mean over categories of the monthly mean of
+    weekly YoY %, last k complete months <= origin). Ablation only; not used in the finals."""
+
+    def g(f, T, ctx):
+        w = ctx["weekly"]
+        w = w[w.index <= ctx["origin"]]["w_mean"].dropna()
+        return float(np.log1p(w.iloc[-k:] / 100).mean())
 
     return g
 

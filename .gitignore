@@ -25,3 +25,4 @@ outputs/shock_risk_latest.csv
 # Large rolling-eval predictions (regenerate with benchmarks/rolling_eval.py)
 outputs/rolling_predictions.csv.gz
 catboost_info/
+outputs/*.log

@@ -22,7 +22,8 @@ import pandas as pd
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 from sbx import backtest as B  # noqa: E402
 from sbx import models as M  # noqa: E402
-from sbx.data import ROOT, load_panel, national_monthly  # noqa: E402
+from sbx.data import ROOT, load_panel, national_monthly, weekly_monthly  # noqa: E402
+from sbx.final import FINAL_BENCHMARK, FINAL_ROBUST, final_models  # noqa: E402
 from sbx.intervals import conformal, interval_metrics  # noqa: E402
 
 OUT = ROOT / "outputs"
@@ -32,7 +33,7 @@ WINDOWS = {
     "apr_nov": pd.date_range("2024-04-01", "2024-11-01", freq="MS"),
     "feb_mar_anomaly": pd.to_datetime(["2024-02-01", "2024-03-01"]),
 }
-FINAL = "v3_error_feedback"
+FINAL = FINAL_BENCHMARK
 REFERENCE = "v2_ensemble"
 
 
@@ -52,13 +53,13 @@ def build_models(fast: bool) -> dict:
         # weights / decomposition
         "horizon_weights": M.horizon_weights(),
         "lowrank_factor4": M.lowrank_factor(4, 2),
-        # final candidate: V2 + online error feedback
-        "v3_error_feedback": M.error_feedback(),
+        # finals (frozen in sbx.final): v3 = V2 + error feedback, v3_hedge = hedge + error feedback
+        **final_models(),
         "v3_ef_lag1": M.error_feedback(lags=1),
+        "common_weekly2": M.blend_components(g(2), M.g_weekly(2)),
         "v3_ef_adaptive_common": M.error_feedback(base=M.blend_components(M.g_adaptive(), M.g_adaptive())),
         # robust alternative: hedge of common-growth estimators (pre-specified, no fitted weights)
-        "v3_hedge": M.v3_hedge,
-        "v3_hedge_ef": M.error_feedback(base=M.v3_hedge),
+        "v3_hedge_no_ef": M.v3_hedge,
         "ef_common_national2": M.error_feedback(base=M.blend_components(g(2), M.g_national(2))),
     }
     if not fast:
@@ -80,12 +81,13 @@ ABLATION = [
     ("common_g2", "V2 with 2m common momentum in both parts"),
     ("common_adaptive", "V2 with adaptively chosen common window"),
     ("v3_ef_lag1", "V2 + error feedback (1 lag)"),
-    ("v3_error_feedback", "V2 + error feedback (2 lags)  [final]"),
+    ("v3", "V3 = V2 + error feedback (2 lags)  [final benchmark]"),
     ("v3_ef_adaptive_common", "V2 + adaptive common + error feedback"),
     ("common_national2", "V2, panel part advanced by national 2m YoY"),
     ("ef_common_national2", "national common + error feedback"),
-    ("v3_hedge", "V2, panel part advanced by hedge {muni 6m, muni 2m, national 2m}"),
-    ("v3_hedge_ef", "hedge + error feedback  [robust alternative]"),
+    ("common_weekly2", "V2, panel part advanced by weekly national category YoY"),
+    ("v3_hedge_no_ef", "V2, panel part advanced by hedge {muni 6m, muni 2m, national 2m}"),
+    ("v3_hedge", "V3-hedge = hedge + error feedback  [final robust]"),
     ("residual_lgbm", "V2 + LightGBM residual"),
     ("residual_catboost", "V2 + CatBoost residual"),
     ("pooled_lgbm_direct", "pooled LightGBM, direct YoY target"),
@@ -99,7 +101,9 @@ def main(fast: bool = False):
     nat = national_monthly()
     models = build_models(fast)
     origins = pd.date_range("2024-02-01", "2024-11-01", freq="MS")
-    df = B.run(panel, models, origins, ctx_fn=lambda o: {"origin": o, "national": nat[nat.index <= o]})
+    wk = weekly_monthly()
+    df = B.run(panel, models, origins,
+               ctx_fn=lambda o: {"origin": o, "national": nat[nat.index <= o], "weekly": wk[wk.index <= o]})
     print("backtest", round(time.time() - t0, 1), "s", flush=True)
     names = list(models)
 
@@ -139,7 +143,7 @@ def main(fast: bool = False):
 
     # conformal intervals for V2 and the final model
     iv = {}
-    for col in [REFERENCE, FINAL, "v3_hedge_ef"]:
+    for col in [REFERENCE, FINAL, FINAL_ROBUST]:
         c = conformal(df[["series", "origin", "h", "target_date", "y", col]], col, panel.logs, panel.periods)
         iv[col] = {w: interval_metrics(c[c["origin"].isin(WINDOWS[w])], col) for w in ["exact", "other", "apr_nov"]}
 
@@ -153,7 +157,7 @@ def main(fast: bool = False):
         j = j.dropna(subset=pcols)
         for c in pcols:
             j[c] = j[c].clip(lower=1.0)
-        prophet = {c: B.metrics(j, c) for c in pcols + ["seasonal_naive", "factor_only6", REFERENCE, FINAL, "v3_hedge_ef"]}
+        prophet = {c: B.metrics(j, c) for c in pcols + ["seasonal_naive", "factor_only6", REFERENCE, FINAL, FINAL_ROBUST]}
         prophet["prophet_median_ae"] = float((j["prophet"] - j["y"]).abs().median())
         prophet["v2_median_ae"] = float((j[REFERENCE] - j["y"]).abs().median())
         prophet["n_series_sampled"] = int(j["series"].nunique())
