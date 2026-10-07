@@ -1,0 +1,19 @@
+{
+  "protocol": "Exploratory transport-neighbor ablation; NOT an untouched test",
+  "category": "Все категории",
+  "neighbors": 8,
+  "distance_weight": "1 / max(distance_km, 1), normalized per destination",
+  "transport_type": "highway",
+  "graph_vintage": "2024-12-31",
+  "historical_availability": "Not established: all 2024-origin graph results are retrospective diagnostics only",
+  "base_features": "unchanged sbx.research_warning.features",
+  "neighbor_features": ["jump", "slope", "past_event"],
+  "logistic_penalty": 0.03,
+  "permuted_graph_seed": 47,
+  "detection_month_indices": [12,13,14,15,16,17,18,19,20,21],
+  "prediction_month_indices": [14,15,16,17,18],
+  "budgets_pct": [1,2,5],
+  "primary_budget_pct": 2,
+  "variants": ["jump", "logistic_base", "neighbor_jump", "logistic_graph", "logistic_permuted_graph"],
+  "selection_policy": "Report all variants; no parameter search on evaluation outcomes; do not replace production forecast or claim causal shock propagation"
+}

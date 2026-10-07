@@ -1,0 +1,88 @@
+{
+  "status": "completed",
+  "protocol": {
+    "protocol": "Exploratory transport-neighbor ablation; NOT an untouched test",
+    "category": "Все категории",
+    "neighbors": 8,
+    "distance_weight": "1 / max(distance_km, 1), normalized per destination",
+    "transport_type": "highway",
+    "graph_vintage": "2024-12-31",
+    "historical_availability": "Not established: all 2024-origin graph results are retrospective diagnostics only",
+    "base_features": "unchanged sbx.research_warning.features",
+    "neighbor_features": [
+      "jump",
+      "slope",
+      "past_event"
+    ],
+    "logistic_penalty": 0.03,
+    "permuted_graph_seed": 47,
+    "detection_month_indices": [
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21
+    ],
+    "prediction_month_indices": [
+      14,
+      15,
+      16,
+      17,
+      18
+    ],
+    "budgets_pct": [
+      1,
+      2,
+      5
+    ],
+    "primary_budget_pct": 2,
+    "variants": [
+      "jump",
+      "logistic_base",
+      "neighbor_jump",
+      "logistic_graph",
+      "logistic_permuted_graph"
+    ],
+    "selection_policy": "Report all variants; no parameter search on evaluation outcomes; do not replace production forecast or claim causal shock propagation"
+  },
+  "n_official_ids_all": 2190,
+  "n_official_rows": 303126,
+  "n_exactly_matched_complete_series": 2016,
+  "legacy_homonym_series_resolved_to_ids": 107,
+  "n_series_without_highway_neighbors": 10,
+  "n_directed_neighbor_edges": 16034,
+  "observed_feature_prefix_check": "passed",
+  "legacy_baseline_metrics_reproduced": true,
+  "versions": {
+    "numpy": "2.3.5",
+    "pandas": "2.2.3",
+    "pyarrow": "25.0.1"
+  },
+  "input_sha256": {
+    "consumption.parquet": "9833ddaaee7b2a182ed4cceeed16469031700ea87d508bd976150c6770ef8a61",
+    "connection.parquet": "20cbd5213d3ac1d0a867f097b485431811614b283d7366eb5cba9f65dc80493d",
+    "market_access.parquet": "434258afe322b7e6e6610b2552d129ae47094613de72dae3d13f6965a28d1dc1",
+    "dataset_description.pdf": "030269e726f969250b911a1fcb72131a4b61c3952aad10c8470ce9c0736c472f"
+  },
+  "source_sha256": {
+    "config/graph_warning.json": "ee2168e0716f8dddd6181a557fa07d77f7649522a7eb736ecc60a5fa0c8d658b",
+    "src/sbx/municipal_graph.py": "278be0e4e53c92dee4f5d2c4d40b51ee33f07b418a5086366bdcef0378ece51d",
+    "benchmarks/graph_warning.py": "9f87c0b95b52dd94950d47bc6c65f103a0c6a3ab37b73e7675e17b835a58220d",
+    "src/sbx/research_warning.py": "5e4426438853d5fd5437e5f8c0d4df8554a55c5e28afb2fb88ac7e64e53ec2e4",
+    "src/sbx/early_warning.py": "9c68929bdbd8889645aa450198bf57453c90afc333abefb61dfb2c487f818967"
+  },
+  "data_source": "SberIndex; user-supplied hackathonlicence.zip; received 2026-10-07",
+  "license_as_stated_in_description": "CC BY-SA 4.0",
+  "notes": [
+    "Full-history signatures recover identity only, not predictive features.",
+    "All source observations already inspected; no independent holdout.",
+    "2024-12-31 transport graph availability at earlier origins is NOT established.",
+    "A single graph permutation is a diagnostic control, not a statistical significance test.",
+    "Market access is not used: its historical publication timing is unknown."
+  ]
+}

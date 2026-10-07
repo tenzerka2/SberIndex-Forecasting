@@ -1,0 +1,508 @@
+{
+  "source_url": "https://www.sberbank.com/common/files/t_dict_municipal.rar",
+  "source_page": "https://sberindex.ru/ru/research/dataset-borders-and-changes-of-municipalities",
+  "received_on": "2026-10-07",
+  "dictionary_rows": 3101,
+  "dictionary_sha256": "4150658c3298fbc87ed79838f503f3a5b9a28da33257ff803c7d9231ddb775d6",
+  "version_rule": "year_from <= year < year_to",
+  "years": {
+    "2023": {
+      "matched": 2016,
+      "regions": 73,
+      "name_differences": [
+        {
+          "territory_id": 1777,
+          "mo": "муниципальный округ Опочецкий",
+          "municipal_district_name": "Опочецкий муниципальный район",
+          "region_name": "Псковская область"
+        },
+        {
+          "territory_id": 1773,
+          "mo": "муниципальный округ Локнянский",
+          "municipal_district_name": "Локнянский муниципальный район",
+          "region_name": "Псковская область"
+        },
+        {
+          "territory_id": 817,
+          "mo": "Кировский муниципальный округ",
+          "municipal_district_name": "городской округ Кировский",
+          "region_name": "Ставропольский край"
+        },
+        {
+          "territory_id": 1771,
+          "mo": "муниципальный округ Красногородский",
+          "municipal_district_name": "Красногородский муниципальный район",
+          "region_name": "Псковская область"
+        },
+        {
+          "territory_id": 2078,
+          "mo": "Бондарский муниципальный округ",
+          "municipal_district_name": "Бондарский муниципальный район",
+          "region_name": "Тамбовская область"
+        },
+        {
+          "territory_id": 1324,
+          "mo": "Павинский муниципальный округ",
+          "municipal_district_name": "Павинский муниципальный район",
+          "region_name": "Костромская область"
+        },
+        {
+          "territory_id": 2142,
+          "mo": "муниципальный округ Торопецкий",
+          "municipal_district_name": "Торопецкий муниципальный район",
+          "region_name": "Тверская область"
+        },
+        {
+          "territory_id": 805,
+          "mo": "Черниговский муниципальный округ",
+          "municipal_district_name": "Черниговский муниципальный район",
+          "region_name": "Приморский край"
+        },
+        {
+          "territory_id": 2120,
+          "mo": "муниципальный округ Калязинский",
+          "municipal_district_name": "Калязинский муниципальный район",
+          "region_name": "Тверская область"
+        },
+        {
+          "territory_id": 1058,
+          "mo": "Кирилловский муниципальный округ",
+          "municipal_district_name": "Кирилловский муниципальный район",
+          "region_name": "Вологодская область"
+        },
+        {
+          "territory_id": 2080,
+          "mo": "Жердевский муниципальный округ",
+          "municipal_district_name": "Жердевский муниципальный район",
+          "region_name": "Тамбовская область"
+        },
+        {
+          "territory_id": 807,
+          "mo": "Шкотовский муниципальный округ",
+          "municipal_district_name": "Шкотовский муниципальный район",
+          "region_name": "Приморский край"
+        },
+        {
+          "territory_id": 1585,
+          "mo": "муниципальный округ Мошенской",
+          "municipal_district_name": "Мошенской муниципальный район",
+          "region_name": "Новгородская область"
+        },
+        {
+          "territory_id": 822,
+          "mo": "Новоалександровский муниципальный округ",
+          "municipal_district_name": "городской округ Новоалександровский",
+          "region_name": "Ставропольский край"
+        },
+        {
+          "territory_id": 221,
+          "mo": "Сегежский муниципальный округ",
+          "municipal_district_name": "Сегежский муниципальный район",
+          "region_name": "Республика Карелия"
+        },
+        {
+          "territory_id": 2095,
+          "mo": "Сосновский муниципальный округ",
+          "municipal_district_name": "Сосновский муниципальный район",
+          "region_name": "Тамбовская область"
+        },
+        {
+          "territory_id": 904,
+          "mo": "Красноборский муниципальный округ",
+          "municipal_district_name": "Красноборский муниципальный район",
+          "region_name": "Архангельская область"
+        },
+        {
+          "territory_id": 825,
+          "mo": "Советский муниципальный округ",
+          "municipal_district_name": "городской округ Советский",
+          "region_name": "Ставропольский край"
+        },
+        {
+          "territory_id": 2079,
+          "mo": "Гавриловский муниципальный округ",
+          "municipal_district_name": "Гавриловский муниципальный район",
+          "region_name": "Тамбовская область"
+        },
+        {
+          "territory_id": 1589,
+          "mo": "муниципальный округ Пестовский",
+          "municipal_district_name": "Пестовский муниципальный район",
+          "region_name": "Новгородская область"
+        },
+        {
+          "territory_id": 226,
+          "mo": "муниципальный округ Вуктыл",
+          "municipal_district_name": "городской округ Вуктыл",
+          "region_name": "Республика Коми"
+        },
+        {
+          "territory_id": 797,
+          "mo": "Партизанский муниципальный округ",
+          "municipal_district_name": "Партизанский муниципальный район",
+          "region_name": "Приморский край"
+        },
+        {
+          "territory_id": 2089,
+          "mo": "Первомайский муниципальный округ",
+          "municipal_district_name": "Первомайский муниципальный район",
+          "region_name": "Тамбовская область"
+        },
+        {
+          "territory_id": 2126,
+          "mo": "муниципальный округ Кувшиновский",
+          "municipal_district_name": "Кувшиновский муниципальный район",
+          "region_name": "Тверская область"
+        },
+        {
+          "territory_id": 791,
+          "mo": "Красноармейский муниципальный округ",
+          "municipal_district_name": "Красноармейский муниципальный район",
+          "region_name": "Приморский край"
+        },
+        {
+          "territory_id": 2082,
+          "mo": "Инжавинский муниципальный округ",
+          "municipal_district_name": "Инжавинский муниципальный район",
+          "region_name": "Тамбовская область"
+        },
+        {
+          "territory_id": 1860,
+          "mo": "Путятинский муниципальный округ",
+          "municipal_district_name": "Путятинский муниципальный район",
+          "region_name": "Рязанская область"
+        },
+        {
+          "territory_id": 2113,
+          "mo": "муниципальный округ Бологовский",
+          "municipal_district_name": "Бологовский муниципальный район",
+          "region_name": "Тверская область"
+        },
+        {
+          "territory_id": 2454,
+          "mo": "внутригородская территория города федерального значения  Александровский муниципальный округ",
+          "municipal_district_name": "внутригородская территория города федерального значения муниципальный округ № 75",
+          "region_name": "Санкт-Петербург"
+        },
+        {
+          "territory_id": 1788,
+          "mo": "муниципальный округ Струго-Красненский",
+          "municipal_district_name": "Струго-Красненский муниципальный район",
+          "region_name": "Псковская область"
+        },
+        {
+          "territory_id": 814,
+          "mo": "Изобильненский муниципальный округ",
+          "municipal_district_name": "городской округ Изобильненский",
+          "region_name": "Ставропольский край"
+        },
+        {
+          "territory_id": 2143,
+          "mo": "муниципальный округ Фировский",
+          "municipal_district_name": "Фировский муниципальный район",
+          "region_name": "Тверская область"
+        },
+        {
+          "territory_id": 208,
+          "mo": "Беломорский муниципальный округ",
+          "municipal_district_name": "Беломорский муниципальный район",
+          "region_name": "Республика Карелия"
+        },
+        {
+          "territory_id": 1323,
+          "mo": "Островский муниципальный округ",
+          "municipal_district_name": "Островский муниципальный район",
+          "region_name": "Костромская область"
+        },
+        {
+          "territory_id": 1775,
+          "mo": "муниципальный округ Новоржевский",
+          "municipal_district_name": "Новоржевский муниципальный район",
+          "region_name": "Псковская область"
+        },
+        {
+          "territory_id": 2085,
+          "mo": "Мордовский муниципальный округ",
+          "municipal_district_name": "Мордовский муниципальный район",
+          "region_name": "Тамбовская область"
+        },
+        {
+          "territory_id": 2111,
+          "mo": "муниципальный округ Бежецкий",
+          "municipal_district_name": "Бежецкий муниципальный район",
+          "region_name": "Тверская область"
+        },
+        {
+          "territory_id": 2618,
+          "mo": "Мантуровский муниципальный округ",
+          "municipal_district_name": "городской округ город Мантурово",
+          "region_name": "Костромская область"
+        },
+        {
+          "territory_id": 1580,
+          "mo": "муниципальный округ Демянский",
+          "municipal_district_name": "Демянский муниципальный район",
+          "region_name": "Новгородская область"
+        },
+        {
+          "territory_id": 2100,
+          "mo": "Умётский муниципальный округ",
+          "municipal_district_name": "Умётский муниципальный район",
+          "region_name": "Тамбовская область"
+        },
+        {
+          "territory_id": 823,
+          "mo": "Петровский муниципальный округ",
+          "municipal_district_name": "городской округ Петровский",
+          "region_name": "Ставропольский край"
+        },
+        {
+          "territory_id": 588,
+          "mo": "Могочинский муниципальный округ",
+          "municipal_district_name": "Могочинский муниципальный район",
+          "region_name": "Забайкальский край"
+        },
+        {
+          "territory_id": 1862,
+          "mo": "Ряжский муниципальный округ",
+          "municipal_district_name": "Ряжский муниципальный район",
+          "region_name": "Рязанская область"
+        },
+        {
+          "territory_id": 1337,
+          "mo": "Варгашинский муниципальный округ",
+          "municipal_district_name": "Варгашинский муниципальный район",
+          "region_name": "Курганская область"
+        },
+        {
+          "territory_id": 580,
+          "mo": "Газимуро-Заводский муниципальный округ",
+          "municipal_district_name": "Газимуро-Заводский муниципальный район",
+          "region_name": "Забайкальский край"
+        },
+        {
+          "territory_id": 821,
+          "mo": "Нефтекумский муниципальный округ",
+          "municipal_district_name": "городской округ Нефтекумский",
+          "region_name": "Ставропольский край"
+        },
+        {
+          "territory_id": 808,
+          "mo": "Яковлевский муниципальный округ",
+          "municipal_district_name": "Яковлевский муниципальный район",
+          "region_name": "Приморский край"
+        },
+        {
+          "territory_id": 2081,
+          "mo": "Знаменский муниципальный округ",
+          "municipal_district_name": "Знаменский муниципальный район",
+          "region_name": "Тамбовская область"
+        },
+        {
+          "territory_id": 2119,
+          "mo": "муниципальный округ Калининский",
+          "municipal_district_name": "Калининский муниципальный район",
+          "region_name": "Тверская область"
+        },
+        {
+          "territory_id": 1350,
+          "mo": "Притобольный муниципальный округ",
+          "municipal_district_name": "Притобольный муниципальный район",
+          "region_name": "Курганская область"
+        },
+        {
+          "territory_id": 2093,
+          "mo": "Ржаксинский муниципальный округ",
+          "municipal_district_name": "Ржаксинский муниципальный район",
+          "region_name": "Тамбовская область"
+        },
+        {
+          "territory_id": 2091,
+          "mo": "Пичаевский муниципальный округ",
+          "municipal_district_name": "Пичаевский муниципальный район",
+          "region_name": "Тамбовская область"
+        },
+        {
+          "territory_id": 228,
+          "mo": "муниципальный округ Усинск",
+          "municipal_district_name": "городской округ Усинск",
+          "region_name": "Республика Коми"
+        },
+        {
+          "territory_id": 1780,
+          "mo": "муниципальный округ Печорский",
+          "municipal_district_name": "Печорский муниципальный район",
+          "region_name": "Псковская область"
+        },
+        {
+          "territory_id": 2094,
+          "mo": "Сампурский муниципальный округ",
+          "municipal_district_name": "Сампурский муниципальный район",
+          "region_name": "Тамбовская область"
+        },
+        {
+          "territory_id": 2098,
+          "mo": "Токарёвский муниципальный округ",
+          "municipal_district_name": "Токарёвский муниципальный район",
+          "region_name": "Тамбовская область"
+        },
+        {
+          "territory_id": 1774,
+          "mo": "муниципальный округ Невельский",
+          "municipal_district_name": "Невельский муниципальный район",
+          "region_name": "Псковская область"
+        },
+        {
+          "territory_id": 1341,
+          "mo": "Катайский муниципальный округ",
+          "municipal_district_name": "Катайский муниципальный район",
+          "region_name": "Курганская область"
+        },
+        {
+          "territory_id": 613,
+          "mo": "Мильковский муниципальный округ",
+          "municipal_district_name": "Мильковский муниципальный район",
+          "region_name": "Камчатский край"
+        },
+        {
+          "territory_id": 2087,
+          "mo": "Мучкапский муниципальный округ",
+          "municipal_district_name": "Мучкапский муниципальный район",
+          "region_name": "Тамбовская область"
+        },
+        {
+          "territory_id": 2096,
+          "mo": "Староюрьевский муниципальный округ",
+          "municipal_district_name": "Староюрьевский муниципальный район",
+          "region_name": "Тамбовская область"
+        },
+        {
+          "territory_id": 2124,
+          "mo": "муниципальный округ Конаковский",
+          "municipal_district_name": "Конаковский муниципальный район",
+          "region_name": "Тверская область"
+        },
+        {
+          "territory_id": 912,
+          "mo": "Приморский муниципальный округ",
+          "municipal_district_name": "Приморский муниципальный район",
+          "region_name": "Архангельская область"
+        },
+        {
+          "territory_id": 1338,
+          "mo": "Далматовский муниципальный округ",
+          "municipal_district_name": "Далматовский муниципальный район",
+          "region_name": "Курганская область"
+        },
+        {
+          "territory_id": 2090,
+          "mo": "Петровский муниципальный округ",
+          "municipal_district_name": "Петровский муниципальный район",
+          "region_name": "Тамбовская область"
+        },
+        {
+          "territory_id": 1328,
+          "mo": "Солигаличский муниципальный округ",
+          "municipal_district_name": "Солигаличский муниципальный район",
+          "region_name": "Костромская область"
+        },
+        {
+          "territory_id": 815,
+          "mo": "Ипатовский муниципальный округ",
+          "municipal_district_name": "городской округ Ипатовский",
+          "region_name": "Ставропольский край"
+        },
+        {
+          "territory_id": 1581,
+          "mo": "муниципальный округ Крестецкий",
+          "municipal_district_name": "Крестецкий муниципальный район",
+          "region_name": "Новгородская область"
+        },
+        {
+          "territory_id": 1061,
+          "mo": "Никольский муниципальный округ",
+          "municipal_district_name": "Никольский муниципальный район",
+          "region_name": "Вологодская область"
+        },
+        {
+          "territory_id": 811,
+          "mo": "Георгиевский муниципальный округ",
+          "municipal_district_name": "городской округ Георгиевский",
+          "region_name": "Ставропольский край"
+        },
+        {
+          "territory_id": 875,
+          "mo": "Зейский муниципальный округ",
+          "municipal_district_name": "Зейский муниципальный район",
+          "region_name": "Амурская область"
+        },
+        {
+          "territory_id": 2088,
+          "mo": "Никифоровский муниципальный округ",
+          "municipal_district_name": "Никифоровский муниципальный район",
+          "region_name": "Тамбовская область"
+        },
+        {
+          "territory_id": 810,
+          "mo": "Благодарненский муниципальный округ",
+          "municipal_district_name": "городской округ Благодарненский",
+          "region_name": "Ставропольский край"
+        },
+        {
+          "territory_id": 592,
+          "mo": "Ононский муниципальный округ",
+          "municipal_district_name": "Ононский муниципальный район",
+          "region_name": "Забайкальский край"
+        },
+        {
+          "territory_id": 583,
+          "mo": "Калганский муниципальный округ",
+          "municipal_district_name": "Калганский муниципальный район",
+          "region_name": "Забайкальский край"
+        },
+        {
+          "territory_id": 819,
+          "mo": "Минераловодский муниципальный округ",
+          "municipal_district_name": "городской округ Минераловодский",
+          "region_name": "Ставропольский край"
+        },
+        {
+          "territory_id": 217,
+          "mo": "Питкярантский муниципальный округ",
+          "municipal_district_name": "Питкярантский муниципальный район",
+          "region_name": "Республика Карелия"
+        },
+        {
+          "territory_id": 1786,
+          "mo": "муниципальный округ Пыталовский",
+          "municipal_district_name": "Пыталовский муниципальный район",
+          "region_name": "Псковская область"
+        },
+        {
+          "territory_id": 854,
+          "mo": "Охотский муниципальный округ",
+          "municipal_district_name": "Охотский муниципальный район",
+          "region_name": "Хабаровский край"
+        }
+      ]
+    },
+    "2024": {
+      "matched": 2016,
+      "regions": 73,
+      "name_differences": [
+        {
+          "territory_id": 2454,
+          "mo": "внутригородская территория города федерального значения  Александровский муниципальный округ",
+          "municipal_district_name": "внутригородская территория города федерального значения муниципальный округ № 75",
+          "region_name": "Санкт-Петербург"
+        }
+      ]
+    }
+  },
+  "notes": [
+    "Metadata is descriptive and is not used by graph-warning prediction models.",
+    "Recovering ID from full-history values is an identity audit, not a predictive feature.",
+    "Source download used a per-request TLS-verification exception after the bank certificate chain could not be verified; no trust settings were changed.",
+    "Retrieved public URLs via the download script of IvanFrolovskiy/sberindex-atlas; no model code or experiment results copied."
+  ]
+}

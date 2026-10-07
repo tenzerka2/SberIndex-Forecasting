@@ -45,3 +45,5 @@ outputs/contest_prophet_all/**/pairs_*.csv.gz
 outputs/ci_*/
 outputs/**/fits_*.jsonl
 outputs/prophet_ci_*/
+outputs/graph_warning/pairs.csv.gz
+outputs/graph_warning/*map*.csv
