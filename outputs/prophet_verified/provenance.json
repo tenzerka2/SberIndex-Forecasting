@@ -1,0 +1,210 @@
+{
+  "workflow_run_url": "https://github.com/tenzerka2/SberIndex-Forecasting/actions/runs/37579679215",
+  "source_commit": "81e49b355f2a745fbeeb30eb091362a2f199a108",
+  "input_sha256": [
+    {
+      "pairs_202312.csv.gz": "320031857640acd9ee041e6d730536266fed309a0723d3fbd4f68a6d5a8b9913",
+      "pairs_202402.csv.gz": "814a6ac841efbddfbb86cb5123caee6576a23eef7bcddd676ff198a4b322eaa4",
+      "pairs_202403.csv.gz": "27b9562d4ae4a64ab8f58a2d3aa1a1a0f00a1f4f9b08c65172c29f2b4f2f0e99",
+      "pairs_202404.csv.gz": "5585c02d6a3264e22a69f37809c07d0d6dccfc93bdc8842c81a850d65c4906fc",
+      "pairs_202405.csv.gz": "530f0c97121bd2f83a22bf3712d325893222c2ec1ff737a5bf73fbe273ff0126",
+      "pairs_202406.csv.gz": "26aac19f00e73845493bbfac0acbc36ea2e0e37ceed77597c980d1c7202b228b",
+      "pairs_202407.csv.gz": "4a2bcb488bbbcacda6fa1fc67efeada1e5de06013e116180f8a9ecd358e26bac",
+      "pairs_202408.csv.gz": "85d2b5e289b4f2c173f70afefb8ef53b5ab160a8ac3c8c68c93ecb7aca6d72d9",
+      "pairs_202409.csv.gz": "880efa5380845270215b3a660c1e055ee898975e1448d5adfa4a43ea02a03a0a",
+      "pairs_202410.csv.gz": "1eecb94f1f04428f0f9de2b28b3c852e009736aa5a3793319922d60b5b4d52f5",
+      "pairs_202411.csv.gz": "e1bac7fe6975a2f9a3c272397de40425d4c710a958c1a03785bae631744bbd57",
+      "manifest.json": "cd8e77bdca3bf30eb848fd215bad02a3c14a8e71759ca60903ef334147575797",
+      "selected_series.csv": "1f7f8ef0a5fedb458511c8f0efe0060b6d2346d88975e38d06739fb65870dced"
+    },
+    {
+      "pairs_202312.csv.gz": "aef53aeba892d7db7f4cf3813874e98146f96519309e4e86c0bf15e63e722a3c",
+      "pairs_202402.csv.gz": "50d9d20d546eba2c869587f688d3674b9313dd57c4bc2bc8efa165c2c16219fb",
+      "pairs_202403.csv.gz": "749387af2787743d165eebbca00b6175f8c34a564cd2df9e0cbd6267c0ebfbf2",
+      "pairs_202404.csv.gz": "1b50bac0c0f7f94d1abfc6c31d0f117de40a6602cbbf51e3c750329699bec6cf",
+      "pairs_202405.csv.gz": "7ed28bb9adcbb70735e5406e2a78e3cfa2930d36601fafab81f107e68dc6c5f3",
+      "pairs_202406.csv.gz": "aa1f577e0b5d78e3d77810f0107971aa69c34b3ee9e4ad2af6e6cf48f690a12c",
+      "pairs_202407.csv.gz": "d893a7526be9f71b5cef4a2ef2ad1d8c43173c2fa06cc781ed875f1716dc2f0b",
+      "pairs_202408.csv.gz": "7e3598d695b669aae24c711d206f87a8722de65b9e3a9019078e690a67a43245",
+      "pairs_202409.csv.gz": "7648f6b7a4eb843ef36a0ac7f4ea3b4f4203d57881d29e1955d0b914afbe62d7",
+      "pairs_202410.csv.gz": "89731899dff83ac482b59fd862278c328c95e5ea877a730faa587b77a3837824",
+      "pairs_202411.csv.gz": "d984a8a9735095388d4c0b9e51da976010aac3c62e5eb744e028f22d4e0e6684",
+      "manifest.json": "cfb1597221a10d0081e455dd360df6bbd4635bf7083a072a2e1938bb0253c8cb",
+      "selected_series.csv": "1f7f8ef0a5fedb458511c8f0efe0060b6d2346d88975e38d06739fb65870dced"
+    },
+    {
+      "pairs_202312.csv.gz": "ed8f5f5ce6c76ddd52292ebe5146247c333b9846cb7d086bce042ba67e25f22c",
+      "pairs_202402.csv.gz": "ef4e37cc9d193a302e03d104c28b698ee97c62e654a00b82a148c26dcd3ec276",
+      "pairs_202403.csv.gz": "512f5d20a3c92fdf3e2cc5c10bc79a7ab49592c8d4fa4f10586bcd12411990eb",
+      "pairs_202404.csv.gz": "e0a0e2c9f77681d3cc38d29cd6db57f1f6578e8367564f462001a4edeb5d1376",
+      "pairs_202405.csv.gz": "7f5b85fd5de275d092c371f722433a6b66448c72f27aba89bb87ac1c482c426b",
+      "pairs_202406.csv.gz": "95c79ab66c91e1076821e0ba522f11b74cf529d496fe60cf7a1f4830dba695ca",
+      "pairs_202407.csv.gz": "be9ffec74a0295e48bfe503c565e5a7ab934059b59b84ad0cb535a788950f5c3",
+      "pairs_202408.csv.gz": "fe8d49f50af67086210b9ff3b9be32f38f6c30e370bd58741cbc7da06b3a474b",
+      "pairs_202409.csv.gz": "8362a08df0439342a84cd7755a48ef9a19081f3d2a9b6ced0697d0ecf71c740a",
+      "pairs_202410.csv.gz": "9eac8fba473f976c44aaf462b3a128c1abf19057acbd5bfb181826312797a364",
+      "pairs_202411.csv.gz": "4a346707889ba349e490dfa48c61174086e16f2e877956c6ba2b3a3c8f03d4b9",
+      "manifest.json": "55304056b177ccf1c89a53aa0de7baeaa609ecfb017ee62eeb9f79bc6b1b19e3",
+      "selected_series.csv": "1f7f8ef0a5fedb458511c8f0efe0060b6d2346d88975e38d06739fb65870dced"
+    }
+  ],
+  "manifests": [
+    {
+      "status": "completed",
+      "prophet_executed": true,
+      "config": {
+        "seed": 0,
+        "sample_size": 400,
+        "horizons": [
+          1,
+          3,
+          6,
+          12
+        ],
+        "min_history": 14,
+        "prophet_variants": [
+          "auto"
+        ],
+        "prediction_floor_rub": 0,
+        "short_history": "December 2023 origin only, h12, national_yoy_fallback reported separately from V3/V4",
+        "selection_policy": "Report every variant; do not tune or select Prophet on reported test errors"
+      },
+      "sample_size": 100,
+      "category": "Все категории",
+      "protocol": "retrospective exploratory; not untouched test or official organizer score",
+      "selection": "complete positive 24-month series; retrospective completeness selection",
+      "exogenous": "current-vintage national data truncated by observation month, not historical release vintage",
+      "data_sha256": "0111f9adfbccc3340977fe94bb1f0c7b19dd2184b8a3052d588af3db36010338",
+      "source_sha256": {
+        "benchmarks/contest_prophet.py": "9e124cd8c982c7dfb4e55dd312d27de9aa99e371c5fb03185a5028904b99100a",
+        "benchmarks/prepare_contest_bundle.py": "6344132269b4efa05ec07fe2cea50fdc35a3457b51977a967b9db8b67a2552a3",
+        "src/sbx/models.py": "297c32ae8ba34e07a386e13c628aaddf80cadbef3fab1772b0d0e1a817d07fe4",
+        "src/sbx/candidates.py": "61ffb37f3d53ee29af372b4fbcf899a03ffa8e787f81cb0cbde003949eabcc89",
+        "src/sbx/final.py": "00ede12c8a24fc43a4497d6ffed7cafda5601fbd132f3ab4bf083f546e1ee5a4",
+        "src/sbx/data.py": "22e49ad920e117fab9265e55e661cc4f21c4e04a5805202fd5eec519d370c63a"
+      },
+      "raw_data_sha256": {
+        "consumer-spending-growth_ru_1791179934458.csv": "4b0a491d68e8c5368ec8d21a6e3ad566ff1540fde6967f0c1c900ecfa6d47d1a",
+        "consumer-spending_ru_1791179920805.csv": "5c1f8ed24a7f71c8c6da51e60ee9aaefd857ac867f5ef485072786bae26d4916",
+        "consumper-spending-index-sa_ru_1791179947372.csv": "726b08a67a886856353abd1a5d7eab8ad69718858c2266da4d8c10bb2b018e0a",
+        "potrebitelskie-beznalicnye-rashody-na-urovne-munizipalnyh-obrazovanij_ru_1764079373653.csv": "c7c2b32f8a36a3a1f3a83db1dbbe8219657afcaf78677623540fa650ccaaa471",
+        "ver-izmenenie-trat-po-kategoriyam_ru_1791191909595.csv": "dea06b69bd2b45f480e5a1cc183e97ec26e0075fa5b57c6c7103e2ec971c08c3"
+      },
+      "versions": {
+        "numpy": "2.4.6",
+        "pandas": "2.3.3",
+        "prophet": "1.5.0",
+        "cmdstanpy": "1.3.0"
+      },
+      "fingerprint": "54b6148c2a17351a73856262ccbc5390c0a9ab864eb77bb6c2e20f599b637c0d",
+      "n_pairs": 2400
+    },
+    {
+      "status": "completed",
+      "prophet_executed": true,
+      "config": {
+        "seed": 0,
+        "sample_size": 400,
+        "horizons": [
+          1,
+          3,
+          6,
+          12
+        ],
+        "min_history": 14,
+        "prophet_variants": [
+          "log_fourier4"
+        ],
+        "prediction_floor_rub": 0,
+        "short_history": "December 2023 origin only, h12, national_yoy_fallback reported separately from V3/V4",
+        "selection_policy": "Report every variant; do not tune or select Prophet on reported test errors"
+      },
+      "sample_size": 100,
+      "category": "Все категории",
+      "protocol": "retrospective exploratory; not untouched test or official organizer score",
+      "selection": "complete positive 24-month series; retrospective completeness selection",
+      "exogenous": "current-vintage national data truncated by observation month, not historical release vintage",
+      "data_sha256": "0111f9adfbccc3340977fe94bb1f0c7b19dd2184b8a3052d588af3db36010338",
+      "source_sha256": {
+        "benchmarks/contest_prophet.py": "9e124cd8c982c7dfb4e55dd312d27de9aa99e371c5fb03185a5028904b99100a",
+        "benchmarks/prepare_contest_bundle.py": "6344132269b4efa05ec07fe2cea50fdc35a3457b51977a967b9db8b67a2552a3",
+        "src/sbx/models.py": "297c32ae8ba34e07a386e13c628aaddf80cadbef3fab1772b0d0e1a817d07fe4",
+        "src/sbx/candidates.py": "61ffb37f3d53ee29af372b4fbcf899a03ffa8e787f81cb0cbde003949eabcc89",
+        "src/sbx/final.py": "00ede12c8a24fc43a4497d6ffed7cafda5601fbd132f3ab4bf083f546e1ee5a4",
+        "src/sbx/data.py": "22e49ad920e117fab9265e55e661cc4f21c4e04a5805202fd5eec519d370c63a"
+      },
+      "raw_data_sha256": {
+        "consumer-spending-growth_ru_1791179934458.csv": "4b0a491d68e8c5368ec8d21a6e3ad566ff1540fde6967f0c1c900ecfa6d47d1a",
+        "consumer-spending_ru_1791179920805.csv": "5c1f8ed24a7f71c8c6da51e60ee9aaefd857ac867f5ef485072786bae26d4916",
+        "consumper-spending-index-sa_ru_1791179947372.csv": "726b08a67a886856353abd1a5d7eab8ad69718858c2266da4d8c10bb2b018e0a",
+        "potrebitelskie-beznalicnye-rashody-na-urovne-munizipalnyh-obrazovanij_ru_1764079373653.csv": "c7c2b32f8a36a3a1f3a83db1dbbe8219657afcaf78677623540fa650ccaaa471",
+        "ver-izmenenie-trat-po-kategoriyam_ru_1791191909595.csv": "dea06b69bd2b45f480e5a1cc183e97ec26e0075fa5b57c6c7103e2ec971c08c3"
+      },
+      "versions": {
+        "numpy": "2.4.6",
+        "pandas": "2.3.3",
+        "prophet": "1.5.0",
+        "cmdstanpy": "1.3.0"
+      },
+      "fingerprint": "10139482aae0865cc3e5752ed6706c424069b0dee564e80a0f1aa921436673e3",
+      "n_pairs": 2400
+    },
+    {
+      "status": "completed",
+      "prophet_executed": true,
+      "config": {
+        "seed": 0,
+        "sample_size": 400,
+        "horizons": [
+          1,
+          3,
+          6,
+          12
+        ],
+        "min_history": 14,
+        "prophet_variants": [
+          "log_month_dummies"
+        ],
+        "prediction_floor_rub": 0,
+        "short_history": "December 2023 origin only, h12, national_yoy_fallback reported separately from V3/V4",
+        "selection_policy": "Report every variant; do not tune or select Prophet on reported test errors"
+      },
+      "sample_size": 100,
+      "category": "Все категории",
+      "protocol": "retrospective exploratory; not untouched test or official organizer score",
+      "selection": "complete positive 24-month series; retrospective completeness selection",
+      "exogenous": "current-vintage national data truncated by observation month, not historical release vintage",
+      "data_sha256": "0111f9adfbccc3340977fe94bb1f0c7b19dd2184b8a3052d588af3db36010338",
+      "source_sha256": {
+        "benchmarks/contest_prophet.py": "9e124cd8c982c7dfb4e55dd312d27de9aa99e371c5fb03185a5028904b99100a",
+        "benchmarks/prepare_contest_bundle.py": "6344132269b4efa05ec07fe2cea50fdc35a3457b51977a967b9db8b67a2552a3",
+        "src/sbx/models.py": "297c32ae8ba34e07a386e13c628aaddf80cadbef3fab1772b0d0e1a817d07fe4",
+        "src/sbx/candidates.py": "61ffb37f3d53ee29af372b4fbcf899a03ffa8e787f81cb0cbde003949eabcc89",
+        "src/sbx/final.py": "00ede12c8a24fc43a4497d6ffed7cafda5601fbd132f3ab4bf083f546e1ee5a4",
+        "src/sbx/data.py": "22e49ad920e117fab9265e55e661cc4f21c4e04a5805202fd5eec519d370c63a"
+      },
+      "raw_data_sha256": {
+        "consumer-spending-growth_ru_1791179934458.csv": "4b0a491d68e8c5368ec8d21a6e3ad566ff1540fde6967f0c1c900ecfa6d47d1a",
+        "consumer-spending_ru_1791179920805.csv": "5c1f8ed24a7f71c8c6da51e60ee9aaefd857ac867f5ef485072786bae26d4916",
+        "consumper-spending-index-sa_ru_1791179947372.csv": "726b08a67a886856353abd1a5d7eab8ad69718858c2266da4d8c10bb2b018e0a",
+        "potrebitelskie-beznalicnye-rashody-na-urovne-munizipalnyh-obrazovanij_ru_1764079373653.csv": "c7c2b32f8a36a3a1f3a83db1dbbe8219657afcaf78677623540fa650ccaaa471",
+        "ver-izmenenie-trat-po-kategoriyam_ru_1791191909595.csv": "dea06b69bd2b45f480e5a1cc183e97ec26e0075fa5b57c6c7103e2ec971c08c3"
+      },
+      "versions": {
+        "numpy": "2.4.6",
+        "pandas": "2.3.3",
+        "prophet": "1.5.0",
+        "cmdstanpy": "1.3.0"
+      },
+      "fingerprint": "7aeafbed00e49dc3599b696e8e42bbe0613fb3e044ba46ffc3d97acb473202d9",
+      "n_pairs": 2400
+    }
+  ],
+  "notes": [
+    "Retrospective exploratory evaluation; data already inspected during development.",
+    "Prepared data verified against original exports. National signals are current-vintage.",
+    "Bootstrap intervals descriptive only: few target months and model selection on related history.",
+    "R2_log_yoy compares log(y/y_previous_year) and log(pred/y_previous_year); undefined when predictions contain zero.",
+    "h12 fallback is a separate method at a single forecast origin, not V3/V4."
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "python": "3.12.14",
+  "numpy": "2.3.5",
+  "pandas": "2.2.3",
+  "upstream_commit": "09c513089d25b7b0e3d0f2697444d004f99f3a60",
+  "command": "bash reproduce.sh",
+  "exit_code": 0,
+  "regression_tests_passed": 11,
+  "forecast_rows_exported": 24192,
+  "raw_data": "five supplied CSV files; checksums in data_manifest.json",
+  "optional_refits": {
+    "Prophet_auto": "not run; dependency unavailable",
+    "Chronos2": "not run; dependency unavailable",
+    "TimesFM": "not rerun; historical benchmark only"
+  },
+  "outputs_sha256": {
+    "warning_metrics.csv": "62439c585949583a1b45864534de1c36e6d0b0534cc2246854aca68b7ecdd045",
+    "news_forecast_ablation.csv": "88b740fe9a1612b82841665bc6d76d63bd5efb8f6e78c19d9578da0f682950e1",
+    "label_revision_audit.csv": "eea854eda025e461fdba391c22ce127216a63afaace24567d59b85656bfdd9df",
+    "local_news_links.csv": "f6e4d5eb9d912b1c15a63afc3300b8ac22a0bffbfa8cddd67105009532c1e534",
+    "paired_comparison.csv": "a67c83b0639a9c7c4db308015fd6b14a5507ea05a2bb6499db15c817a8cfdf53",
+    "national_shape_metrics.csv": "ddba320fe7a0baac85546c982a2b46cbaca070d660b7fd0cffac112fe1157e1b",
+    "v4_metrics.csv": "475567236e07c74b75688035e34692c818cc5f19aafb977fa2b047b2878872b8",
+    "forecast_metrics.csv": "18d6eda6b5453591a2499f8bf976b6a06c22aa4937677741fc2cb18f5a8cf118"
+  }
+}

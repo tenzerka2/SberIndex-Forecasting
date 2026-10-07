@@ -1,0 +1,17 @@
+{
+  "upstream": "09c513089d25b7b0e3d0f2697444d004f99f3a60",
+  "status": "retrospective research; existing windows and categories have already been inspected",
+  "selection": "report every candidate; no claim of independent holdout or contest victory",
+  "origins": "2024-02 through 2024-11, with observable targets only",
+  "horizons": [1, 2, 3, 6],
+  "models": ["filtered_panel6", "robust_common", "robust_filtered", "robust_filtered_hedge", "ridge_relative", "ridge_relative_mae", "ridge_hedge_mae"],
+  "filter_gain": 0.35,
+  "relative_level_gain": 0.65,
+  "ridge_penalty": 0.25,
+  "event_confirmation_months": 2,
+  "event_scale": "past observations before candidate onset only",
+  "event_echo": "past year only",
+  "event_deduplication": "first confirmed onset; next two onsets suppressed",
+  "forecast_improvement": "same forecast pairs; report absolute and relative MAE and all origins",
+  "early_warning": "detection and prediction evaluated separately; alarm budgets fixed at 1%, 2%, 5% of municipalities"
+}

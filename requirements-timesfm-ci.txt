@@ -1,0 +1,13 @@
+# CPU-only JAX dependencies; do not install the timesfm[flax] CUDA extra.
+numpy==2.4.6
+pandas==2.3.3
+timesfm==3.0.2
+jax==0.11.2
+jaxlib==0.11.2
+flax==0.12.10
+orbax-checkpoint==0.12.7
+optax==0.2.8
+einshape==1.0
+jaxtyping==0.3.11
+huggingface_hub==2.1.1
+safetensors==0.8.0

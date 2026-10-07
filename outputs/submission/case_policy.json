@@ -1,0 +1,8 @@
+{
+  "selection": "Two earliest rows by month then series, distinct municipalities, within each task/outcome; illustrative, not representative estimates.",
+  "labels": "Algorithm-defined persistent relative shifts, not externally confirmed economic events.",
+  "false_alarm": "No labeled onset in the task window; not proof no real-world event occurred.",
+  "score": "Ranking score, not a calibrated probability.",
+  "evaluation": "Detection labels mature at t+2; prediction labels at t+5. All training labels are mature at signal time.",
+  "prediction_method": "Jump is the strongest tested simple baseline on these already studied outcomes; not independently validated."
+}

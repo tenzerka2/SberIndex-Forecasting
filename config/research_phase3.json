@@ -1,0 +1,8 @@
+{
+  "status": "exploratory phase after phases 1 and 2; no new holdout",
+  "reason": "Robust filtering improves the exact window but the hedge is more robust on other origins. Test a fixed 50/50 average of these common-trend estimates and the existing time-safe feedback. National seasonal shape failed and is rejected.",
+  "candidates": ["robust_filtered_feedback", "diversified_base", "v4_diversified"],
+  "blend_weight": 0.5,
+  "feedback_lags": 2,
+  "stop_rule": "No further forecasting hyperparameter search in this audit; report all phases and category failures"
+}

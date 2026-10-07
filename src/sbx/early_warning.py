@@ -10,12 +10,13 @@ d_it = log y_it - median_j log y_jt, which removes the common seasonal/macro pat
 "seasonal echo" filter drops shifts that repeat 12 months apart (municipality-specific seasonality,
 e.g. resort areas).
 
-Event (ground truth) at month t for series i:
+Historical event definition (legacy_events, audit only) at month t for series i:
     shift_t = median(d[t:t+3]) - median(d[t-3:t]),   z_t = shift_t / sigma_i
     event if |z_t| >= KAPPA, all three post points lie beyond half the shift on the same side, no
     same-sign shift of >= half the size at t-12 / t+12 (when observable), local maximum within +/-2.
-Labels need months up to t+2. They are always computed from data truncated at a given cutoff, so a
-model trained at time t never sees labels that depend on data after t.
+The original retrospective definition is retained as legacy_events for audit only.
+events() now freezes the pre-event scale, uses past seasonal echoes only, and suppresses
+subsequent onsets causally. Its mature labels never change after t+2.
 
 Online protocol: a detector score s_it uses only months <= t. Row (i, t) is positive if an event
 started at tau in [t-2, t] (the change is detectable with delay 0..2 months).
@@ -43,7 +44,7 @@ def _shift(d: np.ndarray, t: int) -> np.ndarray:
     return np.median(d[:, t : t + 3], axis=1) - np.median(d[:, t - 3 : t], axis=1)
 
 
-def events(L: np.ndarray, kappa: float = KAPPA) -> np.ndarray:
+def legacy_events(L: np.ndarray, kappa: float = KAPPA) -> np.ndarray:
     """Binary (n x T) event matrix computed from the given (possibly truncated) history only."""
     d = rel_level(L)
     n, T = d.shape
@@ -73,6 +74,52 @@ def events(L: np.ndarray, kappa: float = KAPPA) -> np.ndarray:
         lo, hi = max(0, t - 2), min(T, t + 3)
         keep[:, t] &= absz[:, t] >= absz[:, lo:hi].max(axis=1)
     return keep
+
+
+def events(L: np.ndarray, kappa: float = KAPPA) -> np.ndarray:
+    """Prefix-stable operational events, confirmed exactly two months after onset.
+
+    Scale uses observations strictly before onset; echo checks only t-12.
+    Deduplication accepts the first event and suppresses the following two months.
+    First candidate onset is month index 6. The last two columns are unconfirmed,
+    NOT confirmed negatives: callers must respect this maturity boundary.
+    """
+    d = rel_level(L)
+    n, T = d.shape
+    ev = np.zeros((n, T), dtype=bool)
+    last = np.full(n, -100)
+    for t in range(6, T - 2):
+        sig = robust_sigma(d[:, :t])
+        s = _shift(d, t)
+        pre = np.median(d[:, t - 3:t], axis=1)
+        post = d[:, t:t + 3] - pre[:, None]
+        persistent = np.all(np.sign(post) == np.sign(s)[:, None], axis=1)
+        persistent &= np.all(np.abs(post) >= 0.5 * np.abs(s)[:, None], axis=1)
+        echo = np.zeros(n, dtype=bool)
+        if t - 12 >= 3:
+            old = _shift(d, t - 12)
+            echo = (np.sign(old) == np.sign(s)) & (np.abs(old) >= 0.5 * np.abs(s))
+        hit = (np.abs(s) >= kappa * sig) & persistent & ~echo & (t - last > 2)
+        ev[:, t] = hit
+        last[hit] = t
+    return ev
+
+
+def mature_labels(L: np.ndarray, task: str) -> np.ndarray:
+    """Labels with -1 for unavailable outcomes, 0/1 for mature outcomes.
+
+    detect at row t examines onsets t-2..t and matures at t+2.
+    predict at row t examines onsets t+1..t+3 and matures at t+5.
+    """
+    if task not in {"detect", "predict"}:
+        raise ValueError(task)
+    ev = events(L)
+    n, T = ev.shape
+    out = np.full((n, T), -1, dtype=np.int8)
+    delay = 2 if task == "detect" else 5
+    for t in range(6, T - delay):
+        out[:, t] = ev[:, max(0, t - 2):t + 1].any(axis=1) if task == "detect" else ev[:, t + 1:t + 4].any(axis=1)
+    return out
 
 
 def row_labels(ev: np.ndarray, delay: int = 2) -> np.ndarray:

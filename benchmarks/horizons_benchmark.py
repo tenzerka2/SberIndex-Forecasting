@@ -4,7 +4,8 @@ Evidence base is set by the data (24 months, 2023-01..2024-12) and the target mu
   h = 1, 3, 6  origins 2024-02 .. 2024-(12-h): V3 / V3-hedge need 13 months of history (2-month YoY);
                10 / 8 / 5 origins.
   h = 12       target <= 2024-12 forces origin <= 2023-12, where no YoY growth is observable yet:
-               V3, V3-hedge, seasonal growth and Prophet are NOT DEFINED. Evaluated on origins
+               V3, V3-hedge and seasonal growth are NOT DEFINED. Prophet was not evaluated
+               here: short history limits seasonal estimation but does not prohibit a fit. Evaluated on origins
                2023-01..2023-12 with the models that are defined there: seasonal naive, seasonal naive
                x national YoY (national SberIndex series, data <= origin) and zero-shot TimesFM.
 Prophet (log target, cached 400-series sample) and TimesFM (cached zero-shot predictions) are merged on
@@ -33,7 +34,7 @@ LIMITS = {
     3: "8 origins (2024-02..2024-09), 8 target months",
     6: "5 origins (2024-02..2024-06), 5 target months (2024-08..2024-12); origins inside the Q1 anomaly",
     12: "12 origins (2023-01..2023-12), targets 2024-01..2024-12 incl. the Q1 anomaly; V3/V3-hedge/"
-        "seasonal growth/Prophet undefined (no observable YoY at origin)",
+        "seasonal growth undefined (no observable YoY at origin); Prophet not evaluated",
 }
 
 

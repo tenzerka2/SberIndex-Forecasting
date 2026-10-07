@@ -1,0 +1,34 @@
+{
+  "status": "completed_without_prophet",
+  "prophet_executed": false,
+  "config": {
+    "seed": 0,
+    "sample_size": 400,
+    "horizons": [
+      1,
+      3,
+      6,
+      12
+    ],
+    "min_history": 14,
+    "prophet_variants": [
+      "auto",
+      "log_fourier4",
+      "log_month_dummies"
+    ],
+    "prediction_floor_rub": 0,
+    "short_history": "December 2023 origin only, h12, national_yoy_fallback reported separately from V3/V4",
+    "selection_policy": "Report every variant; do not tune or select Prophet on reported test errors"
+  },
+  "sample_size": 2016,
+  "category": "Все категории",
+  "protocol": "retrospective exploratory; not untouched test or official organizer score",
+  "selection": "complete positive 24-month series; retrospective completeness selection",
+  "exogenous": "current-vintage national data truncated by observation month, not historical release vintage",
+  "data_sha256": "c7c2b32f8a36a3a1f3a83db1dbbe8219657afcaf78677623540fa650ccaaa471",
+  "versions": {
+    "numpy": "2.3.5",
+    "pandas": "2.2.3"
+  },
+  "n_pairs": 48384
+}

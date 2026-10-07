@@ -95,7 +95,9 @@ def rolling(L, feats_all, groups, task):
         for v, gs in VARIANTS.items():
             names = [k for g in gs for k in groups[g]]
             Xtr, Xte = stack(feats_all, names, train_rows), stack(feats_all, names, [t])
-            fit_m = month_tr < inner_cut
+            # Inner training must itself respect label maturity at the first validation origin.
+            # Using all rows < inner_cut trains on labels that need validation-period outcomes.
+            fit_m = month_tr <= inner_cut - EMBARGO[task]
             thr = 0.5
             if ytr[fit_m].any() and ytr[~fit_m].any():
                 inner = clf().fit(Xtr[fit_m], ytr[fit_m])

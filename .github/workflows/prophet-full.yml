@@ -1,0 +1,115 @@
+name: Prophet full panel
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: prophet-full-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    outputs:
+      matrix: ${{ steps.matrix.outputs.matrix }}
+    env:
+      OMP_NUM_THREADS: '1'
+      OPENBLAS_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11.16'
+          cache: pip
+          cache-dependency-path: requirements-prophet-verified.txt
+      - run: python -m pip install -r requirements-prophet-verified.txt
+      - run: python -m unittest discover -s tests -p 'test_prophet_full.py'
+      - name: Actual one-series smoke test for all variants
+        run: |
+          for variant in auto log_fourier4 log_month_dummies; do
+            python -u benchmarks/prophet_full_shard.py --variant "$variant" --shards 2016 --shard 0 --workers 1 --output "outputs/full_smoke/$variant"
+          done
+      - id: matrix
+        run: |
+          python - <<'PY'
+          import json,os
+          # Schedule the slow variant first; preserve identical IDs for every variant.
+          matrix={'include':[{'variant':v,'shard':s} for v in ['log_month_dummies','auto','log_fourier4'] for s in range(32)]}
+          with open(os.environ['GITHUB_OUTPUT'],'a') as f:f.write('matrix='+json.dumps(matrix)+'\n')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: full-smoke
+          path: outputs/full_smoke
+          retention-days: 14
+          overwrite: true
+  compute:
+    needs: prepare
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    strategy:
+      fail-fast: false
+      max-parallel: 16
+      matrix: ${{ fromJSON(needs.prepare.outputs.matrix) }}
+    env:
+      OMP_NUM_THREADS: '1'
+      OPENBLAS_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11.16'
+          cache: pip
+          cache-dependency-path: requirements-prophet-verified.txt
+      - run: python -m pip install -r requirements-prophet-verified.txt
+      - name: Restore this shard on a rerun
+        if: github.run_attempt != '1'
+        continue-on-error: true
+        uses: actions/download-artifact@v4
+        with:
+          name: full-${{ matrix.variant }}-${{ matrix.shard }}
+          path: outputs/full_shard
+          github-token: ${{ github.token }}
+          run-id: ${{ github.run_id }}
+      - name: Fit and checkpoint each municipality
+        run: timeout --signal=TERM --kill-after=15s 32m python -u benchmarks/prophet_full_shard.py --variant ${{ matrix.variant }} --shard ${{ matrix.shard }} --shards 32 --workers 2 --resume --output outputs/full_shard
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: full-${{ matrix.variant }}-${{ matrix.shard }}
+          path: outputs/full_shard
+          retention-days: 14
+          overwrite: true
+  summarize:
+    needs: compute
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11.16'
+      - run: python -m pip install numpy==2.4.6 pandas==2.3.3
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: full-*
+          path: outputs/full_artifacts
+      - name: Require every shard and publish the paired comparison
+        env:
+          SOURCE_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: python benchmarks/aggregate_prophet_full.py --input outputs/full_artifacts --output outputs/prophet_full_verified --shards 32 --run-url "$RUN_URL" --commit "$SOURCE_COMMIT"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: full-panel-verified-results
+          path: outputs/prophet_full_verified
+          retention-days: 30
+          overwrite: true

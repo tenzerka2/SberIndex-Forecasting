@@ -1,0 +1,8 @@
+{
+  "reason": "Phase 1 robust filtering reduced exact MAE to 713.53 but did not improve all categories or long horizons. Test national seasonal shape, because the existing hedge only borrows national growth and retains anomalous municipal seasonal bases.",
+  "status": "second exploratory phase, selected after examining phase 1; no untouched holdout",
+  "candidates": ["national_shape_50", "national_shape_100", "national_shape_50_feedback"],
+  "national_offset_window": 3,
+  "national_growth_window": 2,
+  "validation": "report every window and all categories; preserve phase 1 results"
+}

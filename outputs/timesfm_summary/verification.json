@@ -1,0 +1,9 @@
+{
+  "run_id": 37591234694,
+  "artifact_id": 11469475846,
+  "artifact_sha256": "212671ce298ae36417cf94f7ac0eef39bc626ec1cfd669a6f047667ca5a32a91",
+  "pairs_sha256": "3b792b14e1ddac8905476a049fc5f4960d0a569d376c2c2d08bcf9e94c5e089e",
+  "n_pairs": 48384,
+  "MAE_recomputed": true,
+  "coverage_recomputed": true
+}

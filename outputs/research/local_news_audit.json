@@ -1,0 +1,12 @@
+{
+  "records": 550,
+  "usable": 517,
+  "date_conflicts": 10,
+  "month_mismatches": 11,
+  "missing_dates": 22,
+  "unique_articles": 516,
+  "linked_articles": 104,
+  "linked_municipalities": 77,
+  "links": 124,
+  "unresolved_homonyms": 107
+}

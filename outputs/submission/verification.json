@@ -1,0 +1,15 @@
+{
+  "status": "passed",
+  "checks": [
+    "prophet_full: exact 48,384 pairs, targets, SHA256 and every MAE verified",
+    "timesfm: exact 48,384 pairs, targets, SHA256 and every MAE verified",
+    "TimesFM intervals and shared baseline predictions verified",
+    "Primary model freshly recomputed at all 11 evaluation origins"
+  ],
+  "data_sha256": "0111f9adfbccc3340977fe94bb1f0c7b19dd2184b8a3052d588af3db36010338",
+  "versions": {
+    "numpy": "2.3.5",
+    "pandas": "2.2.3"
+  },
+  "scope": "Recompute saved metrics and primary model. Does not refit Prophet or rerun TimesFM; their actual CI evidence is separately retained."
+}
