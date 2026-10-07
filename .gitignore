@@ -44,3 +44,4 @@ outputs/contest_prophet_all/**/pairs_*.csv.gz
 
 outputs/ci_*/
 outputs/**/fits_*.jsonl
+outputs/prophet_ci_*/
