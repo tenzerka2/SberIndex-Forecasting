@@ -1,3 +1,5 @@
+> Историческая версия от 6 октября 2026. Актуальные исправления, пересчитанные результаты и ограничения: [IMPROVEMENT_REPORT.md](IMPROVEMENT_REPORT.md). Метрики старой разметки шоков не сопоставимы напрямую с новой.
+
 # Exact contest-window benchmark
 
 ## Protocol
@@ -26,7 +28,7 @@ By horizon (V2 → V3): h=1 598.35 → 592.86, h=2 722.29 → 716.98, h=3 856.42
 
 `python benchmarks/exact_backtest.py` reproduces V2 alone (MAE 725.686835) with the original script; `benchmarks/rolling_eval.py` asserts the same value before computing anything else.
 
-Prophet, on a fixed random sample of 400 series and the same pairs (`exact_sample400` rows of `FINAL_METRICS.csv`): default settings 20,997.7 RUB (unstable with < 2 years of history), log target 1,627.1 RUB; V2 699.2 and V3 694.1 RUB on the same sample.
+Prophet, on a fixed random sample of 400 series and the same pairs (`exact_sample400` rows of `FINAL_METRICS.csv`): forced yearly seasonality (not defaults) 20,997.7 RUB (unstable with < 2 years of history), log target 1,627.1 RUB; V2 699.2 and V3 694.1 RUB on the same sample.
 
 ## How much to trust this window
 

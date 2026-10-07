@@ -31,3 +31,9 @@ outputs/*.log
 models/
 .venv-tsfm/
 data/external/settlements.csv
+
+# Rebuildable research pairs, kept local; aggregate metrics are versioned.
+outputs/research/*pairs*.csv.gz
+outputs/research/forecast_*_2025.csv.gz
+outputs/research/*_by_origin.csv
+outputs/research/signals_2024_12.csv

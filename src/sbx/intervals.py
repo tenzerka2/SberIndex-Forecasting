@@ -1,4 +1,8 @@
-"""Time-safe two-part conformal prediction intervals on top of any point forecast.
+"""Time-safe two-part empirical prediction intervals on top of any point forecast.
+
+This hybrid uses empirical residual quantiles and a normal-like common-shock band.
+It is not standard split conformal and carries no distribution-free coverage guarantee.
+Function names remain unchanged for API compatibility.
 
 Calibration set for origin T, horizon h: earlier forecasts of the same model whose target month is
 <= T (their errors are observed at T). The log error is split the same way as the forecast error:
@@ -19,7 +23,7 @@ from __future__ import annotations
 
 import numpy as np
 import pandas as pd
-from scipy.stats import norm
+from statistics import NormalDist
 
 from .early_warning import rel_level, robust_sigma
 
@@ -55,7 +59,7 @@ def calibrate(calib: pd.DataFrame, origin: pd.Timestamp, h: int, levels=(0.8, 0.
     zabs = np.abs(recent["_z"]) * np.sqrt(h / recent["h"])
     common = recent.groupby(["origin", "h"])["_c"].first()
     sig_c = 1.4826 * np.median(np.abs(common.to_numpy() / np.sqrt(common.index.get_level_values("h"))))
-    return {lv: (float(np.quantile(zabs, lv)), float(norm.ppf(0.5 + lv / 2) * sig_c * np.sqrt(h))) for lv in levels}
+    return {lv: (float(np.quantile(zabs, lv)), float(NormalDist().inv_cdf(0.5 + lv / 2) * sig_c * np.sqrt(h))) for lv in levels}
 
 
 def conformal(df: pd.DataFrame, col: str, L: np.ndarray, periods: pd.DatetimeIndex,

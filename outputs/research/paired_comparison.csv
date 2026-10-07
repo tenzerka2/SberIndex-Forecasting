@@ -1,0 +1,5 @@
+window,model,delta_MAE,target_months_better,target_months,interpretation
+exact,robust_filtered_feedback,-9.737213120961282,3,6,descriptive only; post-selection and dependent months
+exact,v4_diversified,-2.6496657906248333,3,6,descriptive only; post-selection and dependent months
+all_origins,robust_filtered_feedback,5.078956908303364,2,10,descriptive only; post-selection and dependent months
+all_origins,v4_diversified,-73.63606860202344,7,10,descriptive only; post-selection and dependent months

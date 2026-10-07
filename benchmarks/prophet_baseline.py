@@ -4,9 +4,9 @@ Each fit sees only months <= origin. A cmdstan fit costs ~7 s in our sandbox, so
 random sample of 400 series (seed 0) is used and compared with other models on the SAME pairs.
 Run with --all for the full 2,016 x 4 fits. Output: outputs/prophet_predictions.csv.gz
 
-Variants: "default" (Prophet defaults, yearly seasonality on levels; reproduces the instability of
-Prophet with < 2 years of history) and "log" (--variant log: log target, yearly Fourier order 4,
-conservative changepoints) -> column prophet_log.
+Variants: "forced_yearly" (legacy benchmark, NOT defaults), "auto" (true automatic
+seasonality), and "log" (log target, yearly Fourier order 4, conservative changepoints).
+Legacy column prophet is retained for cache compatibility and means forced_yearly.
 """
 from __future__ import annotations
 
@@ -36,9 +36,15 @@ def _fit_one(args):
         m = Prophet(yearly_seasonality=4, weekly_seasonality=False, daily_seasonality=False,
                     changepoint_prior_scale=0.01, uncertainty_samples=0)
         m.fit(pd.DataFrame({"ds": ds, "y": np.log(y)}))
-    else:
+    elif variant == "auto":
+        m = Prophet(yearly_seasonality="auto", weekly_seasonality=False,
+                    daily_seasonality=False, uncertainty_samples=0)
+        m.fit(pd.DataFrame({"ds": ds, "y": y}))
+    elif variant in {"default", "forced_yearly"}:
         m = Prophet(yearly_seasonality=True, weekly_seasonality=False, daily_seasonality=False)
         m.fit(pd.DataFrame({"ds": ds, "y": y}))
+    else:
+        raise ValueError(f"Unknown Prophet variant: {variant}")
     fut = pd.DataFrame({"ds": [ds[-1] + pd.DateOffset(months=h) for h in hs]})
     yhat = m.predict(fut)["yhat"].to_numpy()
     return series, np.exp(yhat) if variant == "log" else yhat
@@ -59,7 +65,7 @@ def main(workers: int = os.cpu_count() or 2, sample: int | None = 400, variant: 
                 for h, v in zip(hs, yhat):
                     rows.append((i, origin, h, v))
         print("done", origin.date(), flush=True)
-    col = "prophet" if variant == "default" else f"prophet_{variant}"
+    col = "prophet" if variant in {"default", "forced_yearly"} else f"prophet_{variant}"
     new = pd.DataFrame(rows, columns=["series", "origin", "h", col])
     new["origin"] = pd.to_datetime(new["origin"])
     if OUT.exists():
@@ -69,5 +75,5 @@ def main(workers: int = os.cpu_count() or 2, sample: int | None = 400, variant: 
 
 
 if __name__ == "__main__":
-    variant = sys.argv[sys.argv.index("--variant") + 1] if "--variant" in sys.argv else "default"
+    variant = sys.argv[sys.argv.index("--variant") + 1] if "--variant" in sys.argv else "forced_yearly"
     main(sample=None if "--all" in sys.argv else 400, variant=variant)

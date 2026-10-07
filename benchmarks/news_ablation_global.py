@@ -10,11 +10,6 @@ from __future__ import annotations
 import json, sys
 from pathlib import Path
 import numpy as np, pandas as pd
-from sklearn.linear_model import Ridge
-from sklearn.pipeline import make_pipeline
-from sklearn.preprocessing import StandardScaler
-from sklearn.metrics import average_precision_score
-from lightgbm import LGBMClassifier
 
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/"src"))
@@ -33,7 +28,16 @@ NEWS_NAMES=["news_intensity","news_signed","news_natural_emergency","news_securi
             "news_security_sum3","news_enterprise_negative_sum3","news_enterprise_positive_sum3",
             "news_infrastructure_sum3"]
 
-def forecast(panel):
+def ridge_predict(X, y, Z, alpha=10.0):
+    """Standardized ridge with an unpenalized intercept; NumPy equivalent of the old pipeline."""
+    X, y, Z = np.asarray(X, float), np.asarray(y, float), np.asarray(Z, float)
+    mu, sd = X.mean(axis=0), np.maximum(X.std(axis=0), 1e-12)
+    A, C = (X-mu)/sd, (Z-mu)/sd
+    intercept = y.mean()
+    beta = np.linalg.solve(A.T@A + alpha*np.eye(A.shape[1]), A.T@(y-intercept))
+    return intercept+C@beta
+
+def forecast(panel, outdir=OUT):
     d=B.run(panel,{"v3":final_models()["v3"]},ORIGINS)
     nf=news_tensor(panel.periods,len(panel.meta))
     pos={p:i for i,p in enumerate(panel.periods)}
@@ -45,9 +49,14 @@ def forecast(panel):
         te=d[d.origin.eq(origin)].copy(); tr=d[(d.origin<origin)&(d.target_date<=origin)].copy()
         te["v3_news"]=te["v3"]
         if tr.origin.nunique()>=2:
-            model=make_pipeline(StandardScaler(),Ridge(alpha=10.0))
-            model.fit(X(tr),np.log(tr.y/tr.v3))
-            corr=np.clip(model.predict(X(te)),-0.2,0.2)
+            # National news has one independent feature vector per origin/horizon.
+            # Replicating it across 2,016 municipalities would dilute Ridge's penalty.
+            xx = X(tr)
+            z = pd.DataFrame(xx, columns=[f"x{j}" for j in range(xx.shape[1])])
+            z["origin"] = tr.origin.to_numpy(); z["h"] = tr.h.to_numpy()
+            z["target"] = np.log(tr.y.to_numpy()/tr.v3.to_numpy())
+            agg = z.groupby(["origin", "h"], as_index=False).mean(numeric_only=True)
+            corr=np.clip(ridge_predict(agg[[f"x{j}" for j in range(xx.shape[1])]],agg["target"],X(te)),-0.2,0.2)
             te["v3_news"]=te.v3*np.exp(corr)
         frames.append(te)
     z=pd.concat(frames,ignore_index=True)
@@ -55,7 +64,7 @@ def forecast(panel):
     for w,os_ in WINDOWS.items():
         g=z[z.origin.isin(os_)]
         for c in ["v3","v3_news"]: rows.append({"window":w,"model":c,**B.metrics(g,c)})
-    out=pd.DataFrame(rows); out.to_csv(OUT/"news_forecast_ablation.csv",index=False,float_format="%.6f")
+    out=pd.DataFrame(rows); out.to_csv(outdir/"news_forecast_ablation.csv",index=False,float_format="%.6f")
     return out
 
 def labels(ev,task):
@@ -65,6 +74,7 @@ def labels(ev,task):
     return y
 
 def clf():
+    from lightgbm import LGBMClassifier
     return LGBMClassifier(n_estimators=300,learning_rate=.03,num_leaves=15,min_child_samples=100,
         subsample=.8,subsample_freq=1,colsample_bytree=.8,reg_lambda=5,class_weight="balanced",
         random_state=42,verbosity=-1,n_jobs=4)
@@ -88,13 +98,14 @@ def early_warning(panel):
         for t in TEST[task]:
             yt=labels(EW.events(L[:,:t+1]),task); train=list(range(FIRST,t-EMB[task]+1))
             ytr=yt[:,train].T.ravel(); yte=yf[:,t]; month=np.repeat(train,n)
-            Xtr,Xte=stack(names,train),stack(names,[t]); inner=train[-2]; mask=month<inner; thr=.5
+            Xtr,Xte=stack(names,train),stack(names,[t]); inner=train[-2]; mask=month<=inner-EMB[task]; thr=.5
             if ytr[mask].any() and ytr[~mask].any():
                 m=clf().fit(Xtr[mask],ytr[mask]); thr=best_thr(ytr[~mask],m.predict_proba(Xtr[~mask])[:,1])
             m=clf().fit(Xtr,ytr); s=m.predict_proba(Xte)[:,1]; a=s>=thr
             chunks.append(pd.DataFrame({"month":t,"y":yte,"score":s,"alarm":a}))
         return pd.concat(chunks,ignore_index=True)
     def met(d):
+        from sklearn.metrics import average_precision_score
         y=d.y.to_numpy(bool); a=d.alarm.to_numpy(bool); s=d.score.to_numpy()
         tp=(a&y).sum(); fp=(a&~y).sum(); fn=(~a&y).sum(); p=tp/max(tp+fp,1); r=tp/max(tp+fn,1)
         ap=average_precision_score(y,s); br=y.mean()
