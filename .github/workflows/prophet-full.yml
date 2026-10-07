@@ -1,12 +1,5 @@
 name: Prophet full panel
 on:
-  pull_request:
-    types: [opened, synchronize, reopened]
-    paths:
-      - '.github/workflows/prophet-full.yml'
-      - 'benchmarks/prophet_full_shard.py'
-      - 'benchmarks/aggregate_prophet_full.py'
-      - 'tests/test_prophet_full.py'
   workflow_dispatch:
 permissions:
   contents: read

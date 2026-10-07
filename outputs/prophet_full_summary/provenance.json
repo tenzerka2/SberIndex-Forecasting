@@ -1,0 +1,231 @@
+{
+  "workflow_run_url": "https://github.com/tenzerka2/SberIndex-Forecasting/actions/runs/37585934483",
+  "source_commit": "b61185ef2a01714982e57c37dcd5fd33b2a8dc5c",
+  "input_sha256": [
+    {
+      "pairs_202312.csv.gz": "751b8ef3018705a6c7cb72747387f4b3f4fec7403ac9bceaf70f0cae2b8feb73",
+      "pairs_202402.csv.gz": "ff7fba87eddaead2c674bf5f4bd303cfcb0ccc44a62786d38d0478c8a41d441f",
+      "pairs_202403.csv.gz": "cf9e41c3a88e1de02f7f6f4f00302dfcb7c8027292173c265134946d46380ef1",
+      "pairs_202404.csv.gz": "41e49e6fb2bdc4cff3865014c0d758b96c516c70f5fdda8771d9a9607c864ffd",
+      "pairs_202405.csv.gz": "277749d4754939a38589b9c3aad71fe64f785b061164200fa71b7361d711dcb3",
+      "pairs_202406.csv.gz": "1cfb57b7b8ce9bb709b58fa4389c17b835127a0b02d71a15ed98704bec622e3c",
+      "pairs_202407.csv.gz": "c7f1274a1d882afd1e81433de9f4bd7c8464932516d03706177bf884456b510e",
+      "pairs_202408.csv.gz": "604d7683019865e33b5d4f1d2a2d3504738ea2efd32a2bab5a5868783b49bfbb",
+      "pairs_202409.csv.gz": "136662a1712d9cf91e7bb66efdba718c61735a54249057a1e01a38b4f4499c7c",
+      "pairs_202410.csv.gz": "87691953f3adfc262306e650ddfa93f20beaa53edff3d44794daa70329b6525f",
+      "pairs_202411.csv.gz": "c89dbf2bd0ea84200ff1bb0a6cbe5cba8a41786d7381f1cf24dd8f7c173f4cef",
+      "manifest.json": "0542c575d247f4f7a18d7ac0034574feb26a8fa6742b356231b2f4df254f5c95",
+      "selected_series.csv": "0e6f9c6a32cea9567a1627803ba76a468da573d629f0ac932a279f67dd7bd9c9"
+    },
+    {
+      "pairs_202312.csv.gz": "272e5d51d5618212415500f312b7473c9760b7acf77c432e16f6e793cf99470e",
+      "pairs_202402.csv.gz": "cd159d3ea2f7d880929187eb232bb64a5b222fedbe3f57ef0a20090a1c6365e5",
+      "pairs_202403.csv.gz": "dba410920abd4850aeb7047befb6a1e3c3cf0a2962293dc83babdbdb2909213e",
+      "pairs_202404.csv.gz": "be02e9415a896dea7afa440bae9f7367a065e417b1db57b7a456020c19c94333",
+      "pairs_202405.csv.gz": "39d4fc0cf44bd1b2c96f65e592a3057101db4a373e20b823fd07687415dce6be",
+      "pairs_202406.csv.gz": "5c9815e50b61a6ce83a2e6b5f9c439836be977e80d5e9e1ba8046e1290d04ab0",
+      "pairs_202407.csv.gz": "4ae59dd52b58d45890a032fd874cdb711dea57eac7c893c86d698c3692477279",
+      "pairs_202408.csv.gz": "a97b50a31da76ea9f4c91d5fbb46d4d1bd31adb930bf2e33f4c655cb0e85aa6a",
+      "pairs_202409.csv.gz": "0e6f7dc99288f6f793fe3e970ab604840f1ce05c31ab65da101278803a490b0a",
+      "pairs_202410.csv.gz": "3aef746adf460b423d16f9b97c95e18206f375235878a4f2e06fae4f1162b91e",
+      "pairs_202411.csv.gz": "81544ae7b43b0f1f0a85410dd61a705b1b2c58e4acf45c2312785f4e8cfb25e6",
+      "manifest.json": "e2d502cbc10001bc6a93664e1e22951ef150a48535798ccea21053149be6367f",
+      "selected_series.csv": "0e6f9c6a32cea9567a1627803ba76a468da573d629f0ac932a279f67dd7bd9c9"
+    },
+    {
+      "pairs_202312.csv.gz": "2c3d4ab5ba55adb5038c7dc99f3ce497fae61b06d7c3f3c7c7da41cfa39a6606",
+      "pairs_202402.csv.gz": "6c6dc4cb3229beb02f37d89480db993cb7d7a7ce1c88173d84c742410ad87ad7",
+      "pairs_202403.csv.gz": "110a7c0162c5aa2c979447f4207a8dc866accd1b677ad4c5efdc4b45767182c8",
+      "pairs_202404.csv.gz": "d0bee61af2f57525e8cc2dc329744fe10c868e18a64403be0dcdfcf41f7b8bdc",
+      "pairs_202405.csv.gz": "980ae70d3aa9cec0953dd4eed09f1458bae03570855724201022ab199220cf77",
+      "pairs_202406.csv.gz": "be1ca382697b1c3b74d8de51620b272191caaed3804f45b9a8c088e60ab5adf7",
+      "pairs_202407.csv.gz": "a42f4fe7bdeae4a725181987b69e102eae4ab18044d58ef983d8be1153e03317",
+      "pairs_202408.csv.gz": "1fd29f9007cde558f840dc113e0df3a2c6568b8c564fe683bd19f5e0e19dac8b",
+      "pairs_202409.csv.gz": "00c1f4ac9b05a5f84e5e060b30a9372a8ffa4fe48e12e86c1ebed3b3ddae309f",
+      "pairs_202410.csv.gz": "3c3158eaa94ec32542cb917c64358b2b549d7a99a45fbc94ce5fafc143aaccc2",
+      "pairs_202411.csv.gz": "9843ac988926c562220e704afc90c36df5e0b283c79542b579de525b7a12603f",
+      "manifest.json": "19599d30d0d676bfe06a0fcb7273d5e5568b86ff40464161215d21360811d3db",
+      "selected_series.csv": "0e6f9c6a32cea9567a1627803ba76a468da573d629f0ac932a279f67dd7bd9c9"
+    }
+  ],
+  "manifests": [
+    {
+      "status": "completed",
+      "prophet_executed": true,
+      "config": {
+        "seed": 0,
+        "sample_size": 0,
+        "horizons": [
+          1,
+          3,
+          6,
+          12
+        ],
+        "min_history": 14,
+        "prophet_variants": [
+          "auto"
+        ],
+        "prediction_floor_rub": 0,
+        "short_history": "December 2023 origin only, h12, national_yoy_fallback reported separately from V3/V4",
+        "selection_policy": "Report every variant; do not tune or select Prophet on reported test errors"
+      },
+      "sample_size": 2016,
+      "panel_size": 2016,
+      "data_sha256": "0111f9adfbccc3340977fe94bb1f0c7b19dd2184b8a3052d588af3db36010338",
+      "raw_data_sha256": {
+        "consumer-spending-growth_ru_1791179934458.csv": "4b0a491d68e8c5368ec8d21a6e3ad566ff1540fde6967f0c1c900ecfa6d47d1a",
+        "consumer-spending_ru_1791179920805.csv": "5c1f8ed24a7f71c8c6da51e60ee9aaefd857ac867f5ef485072786bae26d4916",
+        "consumper-spending-index-sa_ru_1791179947372.csv": "726b08a67a886856353abd1a5d7eab8ad69718858c2266da4d8c10bb2b018e0a",
+        "potrebitelskie-beznalicnye-rashody-na-urovne-munizipalnyh-obrazovanij_ru_1764079373653.csv": "c7c2b32f8a36a3a1f3a83db1dbbe8219657afcaf78677623540fa650ccaaa471",
+        "ver-izmenenie-trat-po-kategoriyam_ru_1791191909595.csv": "dea06b69bd2b45f480e5a1cc183e97ec26e0075fa5b57c6c7103e2ec971c08c3"
+      },
+      "source_sha256": {
+        "benchmarks/contest_prophet.py": "9e124cd8c982c7dfb4e55dd312d27de9aa99e371c5fb03185a5028904b99100a",
+        "benchmarks/prepare_contest_bundle.py": "6344132269b4efa05ec07fe2cea50fdc35a3457b51977a967b9db8b67a2552a3",
+        "src/sbx/models.py": "297c32ae8ba34e07a386e13c628aaddf80cadbef3fab1772b0d0e1a817d07fe4",
+        "src/sbx/candidates.py": "61ffb37f3d53ee29af372b4fbcf899a03ffa8e787f81cb0cbde003949eabcc89",
+        "src/sbx/final.py": "00ede12c8a24fc43a4497d6ffed7cafda5601fbd132f3ab4bf083f546e1ee5a4",
+        "src/sbx/data.py": "22e49ad920e117fab9265e55e661cc4f21c4e04a5805202fd5eec519d370c63a",
+        "benchmarks/prophet_full_shard.py": "d8c834c5aa6cc0c7039c7f69e1562e6884ca2ea11bb74a15f109685f92fa39f0"
+      },
+      "versions": {
+        "numpy": "2.4.6",
+        "pandas": "2.3.3",
+        "prophet": "1.5.0",
+        "cmdstanpy": "1.3.0"
+      },
+      "verified_reuse": {
+        "run_url": "https://github.com/tenzerka2/SberIndex-Forecasting/actions/runs/37579679215",
+        "source_commit": "81e49b355f2a745fbeeb30eb091362a2f199a108",
+        "pairs_sha256": "b815b863ef3903777e8665eb8a6fc7005fedfb5d46272dd371697d0d66588721",
+        "provenance_sha256": "a54b7e7a4110473127b73b20dfbfe6f92705608d0172a20486b0c915e7a0a97a"
+      },
+      "protocol": "Full panel, retrospective exploratory; same history already studied; no untouched holdout",
+      "category": "Все категории",
+      "selection": "Complete positive 24-month series; retrospective selection",
+      "exogenous": "Current-vintage national observations truncated by origin, release vintages unknown",
+      "n_pairs": 48384
+    },
+    {
+      "status": "completed",
+      "prophet_executed": true,
+      "config": {
+        "seed": 0,
+        "sample_size": 0,
+        "horizons": [
+          1,
+          3,
+          6,
+          12
+        ],
+        "min_history": 14,
+        "prophet_variants": [
+          "log_fourier4"
+        ],
+        "prediction_floor_rub": 0,
+        "short_history": "December 2023 origin only, h12, national_yoy_fallback reported separately from V3/V4",
+        "selection_policy": "Report every variant; do not tune or select Prophet on reported test errors"
+      },
+      "sample_size": 2016,
+      "panel_size": 2016,
+      "data_sha256": "0111f9adfbccc3340977fe94bb1f0c7b19dd2184b8a3052d588af3db36010338",
+      "raw_data_sha256": {
+        "consumer-spending-growth_ru_1791179934458.csv": "4b0a491d68e8c5368ec8d21a6e3ad566ff1540fde6967f0c1c900ecfa6d47d1a",
+        "consumer-spending_ru_1791179920805.csv": "5c1f8ed24a7f71c8c6da51e60ee9aaefd857ac867f5ef485072786bae26d4916",
+        "consumper-spending-index-sa_ru_1791179947372.csv": "726b08a67a886856353abd1a5d7eab8ad69718858c2266da4d8c10bb2b018e0a",
+        "potrebitelskie-beznalicnye-rashody-na-urovne-munizipalnyh-obrazovanij_ru_1764079373653.csv": "c7c2b32f8a36a3a1f3a83db1dbbe8219657afcaf78677623540fa650ccaaa471",
+        "ver-izmenenie-trat-po-kategoriyam_ru_1791191909595.csv": "dea06b69bd2b45f480e5a1cc183e97ec26e0075fa5b57c6c7103e2ec971c08c3"
+      },
+      "source_sha256": {
+        "benchmarks/contest_prophet.py": "9e124cd8c982c7dfb4e55dd312d27de9aa99e371c5fb03185a5028904b99100a",
+        "benchmarks/prepare_contest_bundle.py": "6344132269b4efa05ec07fe2cea50fdc35a3457b51977a967b9db8b67a2552a3",
+        "src/sbx/models.py": "297c32ae8ba34e07a386e13c628aaddf80cadbef3fab1772b0d0e1a817d07fe4",
+        "src/sbx/candidates.py": "61ffb37f3d53ee29af372b4fbcf899a03ffa8e787f81cb0cbde003949eabcc89",
+        "src/sbx/final.py": "00ede12c8a24fc43a4497d6ffed7cafda5601fbd132f3ab4bf083f546e1ee5a4",
+        "src/sbx/data.py": "22e49ad920e117fab9265e55e661cc4f21c4e04a5805202fd5eec519d370c63a",
+        "benchmarks/prophet_full_shard.py": "d8c834c5aa6cc0c7039c7f69e1562e6884ca2ea11bb74a15f109685f92fa39f0"
+      },
+      "versions": {
+        "numpy": "2.4.6",
+        "pandas": "2.3.3",
+        "prophet": "1.5.0",
+        "cmdstanpy": "1.3.0"
+      },
+      "verified_reuse": {
+        "run_url": "https://github.com/tenzerka2/SberIndex-Forecasting/actions/runs/37579679215",
+        "source_commit": "81e49b355f2a745fbeeb30eb091362a2f199a108",
+        "pairs_sha256": "b815b863ef3903777e8665eb8a6fc7005fedfb5d46272dd371697d0d66588721",
+        "provenance_sha256": "a54b7e7a4110473127b73b20dfbfe6f92705608d0172a20486b0c915e7a0a97a"
+      },
+      "protocol": "Full panel, retrospective exploratory; same history already studied; no untouched holdout",
+      "category": "Все категории",
+      "selection": "Complete positive 24-month series; retrospective selection",
+      "exogenous": "Current-vintage national observations truncated by origin, release vintages unknown",
+      "n_pairs": 48384
+    },
+    {
+      "status": "completed",
+      "prophet_executed": true,
+      "config": {
+        "seed": 0,
+        "sample_size": 0,
+        "horizons": [
+          1,
+          3,
+          6,
+          12
+        ],
+        "min_history": 14,
+        "prophet_variants": [
+          "log_month_dummies"
+        ],
+        "prediction_floor_rub": 0,
+        "short_history": "December 2023 origin only, h12, national_yoy_fallback reported separately from V3/V4",
+        "selection_policy": "Report every variant; do not tune or select Prophet on reported test errors"
+      },
+      "sample_size": 2016,
+      "panel_size": 2016,
+      "data_sha256": "0111f9adfbccc3340977fe94bb1f0c7b19dd2184b8a3052d588af3db36010338",
+      "raw_data_sha256": {
+        "consumer-spending-growth_ru_1791179934458.csv": "4b0a491d68e8c5368ec8d21a6e3ad566ff1540fde6967f0c1c900ecfa6d47d1a",
+        "consumer-spending_ru_1791179920805.csv": "5c1f8ed24a7f71c8c6da51e60ee9aaefd857ac867f5ef485072786bae26d4916",
+        "consumper-spending-index-sa_ru_1791179947372.csv": "726b08a67a886856353abd1a5d7eab8ad69718858c2266da4d8c10bb2b018e0a",
+        "potrebitelskie-beznalicnye-rashody-na-urovne-munizipalnyh-obrazovanij_ru_1764079373653.csv": "c7c2b32f8a36a3a1f3a83db1dbbe8219657afcaf78677623540fa650ccaaa471",
+        "ver-izmenenie-trat-po-kategoriyam_ru_1791191909595.csv": "dea06b69bd2b45f480e5a1cc183e97ec26e0075fa5b57c6c7103e2ec971c08c3"
+      },
+      "source_sha256": {
+        "benchmarks/contest_prophet.py": "9e124cd8c982c7dfb4e55dd312d27de9aa99e371c5fb03185a5028904b99100a",
+        "benchmarks/prepare_contest_bundle.py": "6344132269b4efa05ec07fe2cea50fdc35a3457b51977a967b9db8b67a2552a3",
+        "src/sbx/models.py": "297c32ae8ba34e07a386e13c628aaddf80cadbef3fab1772b0d0e1a817d07fe4",
+        "src/sbx/candidates.py": "61ffb37f3d53ee29af372b4fbcf899a03ffa8e787f81cb0cbde003949eabcc89",
+        "src/sbx/final.py": "00ede12c8a24fc43a4497d6ffed7cafda5601fbd132f3ab4bf083f546e1ee5a4",
+        "src/sbx/data.py": "22e49ad920e117fab9265e55e661cc4f21c4e04a5805202fd5eec519d370c63a",
+        "benchmarks/prophet_full_shard.py": "d8c834c5aa6cc0c7039c7f69e1562e6884ca2ea11bb74a15f109685f92fa39f0"
+      },
+      "versions": {
+        "numpy": "2.4.6",
+        "pandas": "2.3.3",
+        "prophet": "1.5.0",
+        "cmdstanpy": "1.3.0"
+      },
+      "verified_reuse": {
+        "run_url": "https://github.com/tenzerka2/SberIndex-Forecasting/actions/runs/37579679215",
+        "source_commit": "81e49b355f2a745fbeeb30eb091362a2f199a108",
+        "pairs_sha256": "b815b863ef3903777e8665eb8a6fc7005fedfb5d46272dd371697d0d66588721",
+        "provenance_sha256": "a54b7e7a4110473127b73b20dfbfe6f92705608d0172a20486b0c915e7a0a97a"
+      },
+      "protocol": "Full panel, retrospective exploratory; same history already studied; no untouched holdout",
+      "category": "Все категории",
+      "selection": "Complete positive 24-month series; retrospective selection",
+      "exogenous": "Current-vintage national observations truncated by origin, release vintages unknown",
+      "n_pairs": 48384
+    }
+  ],
+  "notes": [
+    "Retrospective exploratory evaluation; data already inspected during development.",
+    "Prepared data verified against original exports. National signals are current-vintage.",
+    "Bootstrap intervals descriptive only: few target months and model selection on related history.",
+    "R2_log_yoy compares log(y/y_previous_year) and log(pred/y_previous_year); undefined when predictions contain zero.",
+    "h12 fallback is a separate method at a single forecast origin, not V3/V4."
+  ]
+}

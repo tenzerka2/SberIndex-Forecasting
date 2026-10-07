@@ -1,3 +1,5 @@
+> Full 2016-series comparison completed: [verified results](FULL_PROPHET_RESULTS.md). V3 Hedge MAE reduction versus the best tested Prophet at each horizon: 32.4% / 41.1% / 42.8% for h=1/3/6. Retrospective evaluation; not an organizer score.
+
 > Все три варианта Prophet рассчитаны в GitHub Actions: [запуск сравнения](https://github.com/tenzerka2/SberIndex-Forecasting/actions/runs/37579679215). Colab не требуется. Актуальные результаты: [отчёт](VERIFIED_PROPHET_RESULTS.md), [PDF для защиты](output/pdf/SberIndex_verified_report.pdf). На одинаковых 100 рядах V3-hedge лучше всех трёх вариантов Prophet по MAE на h=1/3/6; это ретроспективная оценка.
 
 > Новое: конкурсный архив точно сопоставлен со всеми 2016 рядами; добавлены официальные territory_id, регионы и ОКТМО. Транспортные соседские сигналы проверены и не включены в основную модель: [результаты и справочники](GRAPH_WARNING_REPORT.md).

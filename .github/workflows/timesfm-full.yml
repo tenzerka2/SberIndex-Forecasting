@@ -1,0 +1,115 @@
+name: TimesFM paired full panel
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      - '.github/workflows/timesfm-full.yml'
+      - 'benchmarks/contest_timesfm.py'
+      - 'benchmarks/aggregate_timesfm.py'
+      - 'requirements-timesfm-ci.txt'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: timesfm-full-${{ github.ref }}
+  cancel-in-progress: false
+env:
+  OMP_NUM_THREADS: '2'
+  OPENBLAS_NUM_THREADS: '1'
+  JAX_PLATFORMS: cpu
+  XLA_FLAGS: --xla_force_host_platform_device_count=1
+  SOURCE_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.SOURCE_COMMIT }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: requirements-timesfm-ci.txt
+      - run: python -m pip install -r requirements-timesfm-ci.txt
+      - run: python -m unittest discover -s tests -p test_contest_timesfm.py
+      - uses: actions/cache@v4
+        with:
+          path: models/timesfm-2.5-200m-flax
+          key: timesfm-2.5-flax-official-v1
+      - run: python -u benchmarks/fetch_timesfm.py
+      - name: Actual two-series inference with both input variants
+        run: python -u benchmarks/contest_timesfm.py --origin 0 --sample-size 2 --output outputs/timesfm_ci_smoke
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: tsfm-smoke
+          path: outputs/timesfm_ci_smoke
+          overwrite: true
+  compute:
+    needs: prepare
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    strategy:
+      fail-fast: false
+      max-parallel: 6
+      matrix:
+        origin: [0,1,2,3,4,5,6,7,8,9,10]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.SOURCE_COMMIT }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: requirements-timesfm-ci.txt
+      - run: python -m pip install -r requirements-timesfm-ci.txt
+      - uses: actions/cache/restore@v4
+        with:
+          path: models/timesfm-2.5-200m-flax
+          key: timesfm-2.5-flax-official-v1
+          fail-on-cache-miss: true
+      - name: Infer and save each batch
+        run: timeout --signal=TERM --kill-after=15s 32m python -u benchmarks/contest_timesfm.py --origin ${{ matrix.origin }} --output outputs/timesfm_ci_origin
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: tsfm-origin-${{ matrix.origin }}
+          path: outputs/timesfm_ci_origin
+          retention-days: 30
+          overwrite: true
+  summarize:
+    needs: compute
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.SOURCE_COMMIT }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install numpy==2.4.6 pandas==2.3.3
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: tsfm-origin-*
+          path: outputs/timesfm_ci_artifacts
+      - uses: actions/download-artifact@v4
+        with:
+          name: full-panel-verified-results
+          run-id: '37585934483'
+          github-token: ${{ github.token }}
+          path: outputs/timesfm_ci_reference
+      - name: Require exact paired coverage and compute metrics
+        env:
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: python benchmarks/aggregate_timesfm.py --input outputs/timesfm_ci_artifacts --reference outputs/timesfm_ci_reference --output outputs/timesfm_ci_verified
+      - uses: actions/upload-artifact@v4
+        with:
+          name: timesfm-full-verified-results
+          path: outputs/timesfm_ci_verified
+          retention-days: 30
+          overwrite: true

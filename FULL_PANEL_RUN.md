@@ -1,6 +1,6 @@
 # Полная проверка Prophet: протокол запуска
 
-Статус на 7 октября 2026: запуск начат, итоговые результаты ещё не получены.
+Status: completed successfully on 2026-10-07 at 10:51 Moscow. Results: [FULL_PROPHET_RESULTS.md](FULL_PROPHET_RESULTS.md).
 
 Расчёт: https://github.com/tenzerka2/SberIndex-Forecasting/actions/runs/37585934483
 

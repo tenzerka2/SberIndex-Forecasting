@@ -1,0 +1,12 @@
+{
+  "run_id": 37585934483,
+  "source_commit": "b61185ef2a01714982e57c37dcd5fd33b2a8dc5c",
+  "artifact_id": 11467758644,
+  "artifact_sha256": "bef50c58aebcf273c9a05c2929205d0be8339268fbc1e2e7f486fa1378a9850b",
+  "pairs": 48384,
+  "municipalities": 2016,
+  "completed_shards": 96,
+  "new_fits": 63228,
+  "reused_fits": 3300,
+  "local_verification": "All MAEs independently recomputed from downloaded forecast pairs; exact key coverage and archive SHA256 verified."
+}

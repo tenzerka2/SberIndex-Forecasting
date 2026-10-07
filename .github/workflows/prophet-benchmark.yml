@@ -1,14 +1,5 @@
 name: Prophet comparison
 on:
-  pull_request:
-    types: [opened, synchronize, reopened]
-    paths:
-      - '.github/workflows/prophet-benchmark.yml'
-      - 'benchmarks/contest_prophet.py'
-      - 'benchmarks/prepare_contest_bundle.py'
-      - 'data/benchmark/**'
-      - 'config/contest_prophet.json'
-      - 'requirements-prophet.txt'
   workflow_dispatch:
 permissions:
   contents: read
