@@ -50,3 +50,4 @@ outputs/graph_warning/*map*.csv
 outputs/full_*/
 outputs/prophet_full_verified/
 outputs/timesfm_ci_*/
+output/delivery/
