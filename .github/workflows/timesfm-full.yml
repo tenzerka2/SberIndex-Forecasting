@@ -1,12 +1,5 @@
 name: TimesFM paired full panel
 on:
-  pull_request:
-    types: [opened, synchronize, reopened]
-    paths:
-      - '.github/workflows/timesfm-full.yml'
-      - 'benchmarks/contest_timesfm.py'
-      - 'benchmarks/aggregate_timesfm.py'
-      - 'requirements-timesfm-ci.txt'
   workflow_dispatch:
 permissions:
   contents: read

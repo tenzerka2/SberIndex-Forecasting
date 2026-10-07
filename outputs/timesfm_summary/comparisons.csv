@@ -1,0 +1,8 @@
+regime,h,candidate,baseline,MAE_reduction_pct,municipalities_better_pct,origins_better,origins_total
+main,1,v3_hedge,timesfm_raw,59.05982290264706,99.50396825396825,9,10
+main,1,v3_hedge,timesfm_yoy,19.106044751184868,86.95436507936508,10,10
+main,3,v3_hedge,timesfm_raw,59.66571552833092,98.90873015873017,7,8
+main,3,v3_hedge,timesfm_yoy,21.04357122631256,81.29960317460318,8,8
+main,6,v3_hedge,timesfm_raw,69.0023798628722,98.16468253968253,5,5
+main,6,v3_hedge,timesfm_yoy,30.164180251969874,77.08333333333334,5,5
+short_history_fallback,12,national_yoy_fallback,timesfm_raw,84.34356365964003,98.80952380952381,1,1
