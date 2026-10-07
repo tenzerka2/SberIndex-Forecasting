@@ -1,6 +1,11 @@
 {
   "origin": "2024-12-01",
-  "model": "v3_hedge",
+  "model_by_horizon": {
+    "1": "v3_hedge",
+    "3": "v3_hedge",
+    "6": "v3_hedge",
+    "12": "national_yoy_fallback"
+  },
   "n_forecasts": 8064,
   "official_ids_attached": true,
   "metadata_year": 2024,

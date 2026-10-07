@@ -97,12 +97,10 @@ jobs:
         with:
           pattern: tsfm-origin-*
           path: outputs/timesfm_ci_artifacts
-      - uses: actions/download-artifact@v4
-        with:
-          name: full-panel-verified-results
-          run-id: '37585934483'
-          github-token: ${{ github.token }}
-          path: outputs/timesfm_ci_reference
+      - name: Load permanently versioned Prophet reference
+        run: |
+          mkdir -p outputs/timesfm_ci_reference/verified
+          cp outputs/prophet_full_summary/verified_pairs.csv.gz outputs/prophet_full_summary/provenance.json outputs/timesfm_ci_reference/verified/
       - name: Require exact paired coverage and compute metrics
         env:
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}

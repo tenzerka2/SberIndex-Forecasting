@@ -10,6 +10,21 @@ from sbx.final import final_models
 from prepare_contest_bundle import load_bundle
 
 
+def predict_by_horizon(history,ctx):
+    """Use the checked main model at h1/3/6 and the separately evaluated h12 fallback."""
+    if history.shape[1]<12:raise ValueError('At least 12 monthly observations are required')
+    hs=[1,3,6,12];t=history.shape[1]-1
+    spend=ctx['national'].nat_spend.dropna()
+    growth=np.log(spend.iloc[-1]/spend.loc[spend.index[-1]-pd.DateOffset(years=1)])
+    pred={h:history[:,t+h-12]+growth for h in hs}
+    models={h:'national_yoy_fallback' for h in hs}
+    if history.shape[1]>=14:
+        pred.update(final_models()['v3_hedge'](history,[1,3,6],ctx))
+        models.update({h:'v3_hedge' for h in [1,3,6]})
+    if any(not np.isfinite(a).all() for a in pred.values()):raise ValueError('Nonfinite forecast')
+    return pred,models
+
+
 def main():
     ap=argparse.ArgumentParser();ap.add_argument('--origin',default='2024-12-01')
     ap.add_argument('--prepared',type=Path,default=ROOT/'data/benchmark')
@@ -34,27 +49,21 @@ def main():
         raise SystemExit(f'Territory map does not exist: {map_path}')
     if history.shape[1]<12:raise SystemExit('At least 12 monthly observations are required')
     hs=[1,3,6,12];ctx={'origin':origin,'national':nat.loc[:origin],'weekly':wk.loc[:origin]}
-    if history.shape[1]>=14:
-        model='v3_hedge';pred=final_models()[model](history,hs,ctx)
-    else:
-        model='national_yoy_fallback'
-        spend=ctx['national'].nat_spend.dropna()
-        growth=np.log(spend.iloc[-1]/spend.loc[spend.index[-1]-pd.DateOffset(years=1)])
-        pred={h:history[:,t+h-12]+growth for h in hs}
+    pred,models=predict_by_horizon(history,ctx)
     rows=[]
     for h in hs:
         rows.append(pd.DataFrame({'run_id':p.meta.run_id,'municipality_name':p.meta.mo,
             'ambiguous_name':p.meta.homonym,'origin':origin,'h':h,
             'target_date':origin+pd.DateOffset(months=h),'forecast_rub':np.exp(pred[h]),
-            'model':model,'historical_demo':True,
-            'horizon_validation':'single-origin fallback only; V3-hedge h12 not backtested' if h==12 else 'retrospective 2024 rolling evaluation'}))
+            'model':models[h],'historical_demo':True,
+            'horizon_validation':'single-origin h12 fallback evaluation only' if h==12 else ('retrospective 2024 rolling evaluation' if models[h]=='v3_hedge' else 'short-history fallback; this horizon not separately validated')}))
     result=pd.concat(rows,ignore_index=True)
     if metadata is not None:
         cols=['run_id','territory_id','region_code','region_name','oktmo','municipal_district_name']
         result=result.merge(metadata[cols].rename(columns={'municipal_district_name':'official_municipality_name'}),on='run_id',validate='many_to_one')
     args.output.mkdir(parents=True,exist_ok=True)
     path=args.output/f'forecast_{origin:%Y%m}.csv.gz';result.to_csv(path,index=False)
-    (args.output/'manifest.json').write_text(json.dumps({'origin':str(origin.date()),'model':model,
+    (args.output/'manifest.json').write_text(json.dumps({'origin':str(origin.date()),'model_by_horizon':models,
         'n_forecasts':len(result),'official_ids_attached':metadata is not None,
         'metadata_year':origin.year if metadata is not None else None,
         'inputs':manifest,'warning':'Historical example, not a forecast from October 2026. No calibrated uncertainty or guaranteed shock prevention claimed.'},ensure_ascii=False,indent=2))

@@ -8,5 +8,6 @@
   "completed_shards": 96,
   "new_fits": 63228,
   "reused_fits": 3300,
-  "local_verification": "All MAEs independently recomputed from downloaded forecast pairs; exact key coverage and archive SHA256 verified."
+  "local_verification": "All MAEs independently recomputed from downloaded forecast pairs; exact key coverage and archive SHA256 verified.",
+  "verified_pairs_sha256": "7411504c0f60468af5ec559bae6b43944b7d3e110296f9a95b7d15b0db7155a8"
 }
