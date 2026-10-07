@@ -6,6 +6,7 @@ import hashlib
 import importlib.metadata
 import json
 import logging
+import time
 from pathlib import Path
 import sys
 import numpy as np
@@ -13,9 +14,11 @@ import pandas as pd
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'src'))
+sys.path.insert(0, str(ROOT / 'benchmarks'))
 from sbx.data import load_panel, national_monthly, weekly_monthly, find
 from sbx.final import final_models
 from sbx.candidates import v4_models
+from prepare_contest_bundle import load_bundle
 
 
 def evaluation_origins(periods, horizons, min_history=14):
@@ -96,6 +99,9 @@ def main():
     parser.add_argument('--workers', type=int, default=2)
     parser.add_argument('--sample', type=int, help='Override sample size; 0 means all municipalities')
     parser.add_argument('--skip-prophet', action='store_true', help='Infrastructure check only; NOT a Prophet benchmark')
+    parser.add_argument('--prepared', type=Path, help='Verified prepared inputs; no raw-file uploads required')
+    parser.add_argument('--variants', nargs='+', choices=['auto','log_fourier4','log_month_dummies'])
+    parser.add_argument('--resume', action='store_true', help='Resume only if inputs, versions, config and code hashes match')
     parser.add_argument('--output', type=Path, default=ROOT/'outputs/contest_prophet')
     args = parser.parse_args()
     cfg = json.loads(args.config.read_text())
@@ -106,32 +112,45 @@ def main():
             import prophet  # noqa: F401
         except ImportError as e:
             raise SystemExit('Prophet unavailable. Install requirements-prophet.txt or use notebooks/contest_prophet.ipynb. No comparison was run.') from e
-    p = load_panel()
+    if args.variants:
+        cfg['prophet_variants'] = args.variants
+    if args.prepared:
+        p, nat, wk, bundle_manifest = load_bundle(args.prepared)
+    else:
+        p = load_panel()
+        nat, wk = national_monthly(), weekly_monthly()
+        bundle_manifest = None
     count = cfg['sample_size'] if args.sample is None else args.sample
     if not 0 <= count <= len(p.values):
         parser.error('sample must be between 0 and the panel size')
     ids = np.arange(len(p.values)) if count == 0 else np.sort(np.random.default_rng(cfg['seed']).choice(len(p.values), count, replace=False))
-    nat, wk = national_monthly(), weekly_monthly()
     models = {**final_models(), **{k:v for k,v in v4_models().items() if k == 'v4_diversified'}}
     # Deliberately separate output folder prevents a dry run overwriting completed evidence.
     out = args.output / ('without_prophet' if args.skip_prophet else 'with_prophet')
-    if (out/'manifest.json').exists():
+    if (out/'manifest.json').exists() and not args.resume:
         raise SystemExit(f'Output already exists: {out}. Choose a fresh --output path to preserve evidence.')
     out.mkdir(parents=True, exist_ok=True)
     selected = p.meta.iloc[ids].copy()
     selected.insert(0, 'series', ids)
-    selected.to_csv(out/'selected_series.csv', index=False)
+    previous = json.loads((out/'manifest.json').read_text()) if (out/'manifest.json').exists() else None
     manifest = {'status':'running', 'prophet_executed':not args.skip_prophet, 'config':cfg,
                 'sample_size':len(ids), 'category':'Все категории',
                 'protocol':'retrospective exploratory; not untouched test or official organizer score',
                 'selection':'complete positive 24-month series; retrospective completeness selection',
                 'exogenous':'current-vintage national data truncated by observation month, not historical release vintage',
-                'data_sha256':hashlib.sha256(find('potrebitelskie-beznalicnye*.csv').read_bytes()).hexdigest(),
-                'source_sha256':{str(f.relative_to(ROOT)):hashlib.sha256(f.read_bytes()).hexdigest() for f in [Path(__file__), ROOT/'src/sbx/models.py', ROOT/'src/sbx/candidates.py', ROOT/'src/sbx/final.py', ROOT/'src/sbx/data.py']},
-                'raw_data_sha256':{f.name:hashlib.sha256(f.read_bytes()).hexdigest() for f in sorted((ROOT/'data/raw').glob('*.csv'))},
+                'data_sha256':bundle_manifest['payload_sha256'] if bundle_manifest else hashlib.sha256(find('potrebitelskie-beznalicnye*.csv').read_bytes()).hexdigest(),
+                'source_sha256':{str(f.relative_to(ROOT)):hashlib.sha256(f.read_bytes()).hexdigest() for f in [Path(__file__), ROOT/'benchmarks/prepare_contest_bundle.py', ROOT/'src/sbx/models.py', ROOT/'src/sbx/candidates.py', ROOT/'src/sbx/final.py', ROOT/'src/sbx/data.py']},
+                'raw_data_sha256':bundle_manifest['raw_sha256'] if bundle_manifest else {f.name:hashlib.sha256(f.read_bytes()).hexdigest() for f in sorted((ROOT/'data/raw').glob('*.csv'))},
                 'versions':{name:importlib.metadata.version(name) for name in ['numpy','pandas'] + ([] if args.skip_prophet else ['prophet','cmdstanpy'])}}
+    identity = {k:v for k,v in manifest.items() if k != 'status'}
+    fingerprint = hashlib.sha256(json.dumps(identity,sort_keys=True).encode()).hexdigest()
+    manifest['fingerprint'] = fingerprint
+    if previous and previous.get('fingerprint') != fingerprint:
+        raise SystemExit('Resume refused: input/config/code/version fingerprint differs')
+    selected.to_csv(out/'selected_series.csv', index=False)
     (out/'manifest.json').write_text(json.dumps(manifest, indent=2, ensure_ascii=False))
     frames = []
+    started = time.monotonic()
     for t, hs, regime in evaluation_origins(p.periods, cfg['horizons'], cfg['min_history']):
         origin = p.periods[t]
         hist = p.logs[:, :t+1].copy()
@@ -151,11 +170,31 @@ def main():
         if not args.skip_prophet:
             for variant in cfg['prophet_variants']:
                 tasks = [(int(i), list(p.periods[:t+1]), p.values[i,:t+1], hs, variant, cfg['seed']) for i in ids]
-                if args.workers == 1:
-                    fitted = list(map(fit_prophet, tasks))
-                else:
-                    with ProcessPoolExecutor(args.workers) as executor:
-                        fitted = list(executor.map(fit_prophet, tasks, chunksize=8))
+                cache = out/f'fits_{origin:%Y%m}_{variant}.jsonl'
+                fitted_by_id = {}
+                if cache.exists():
+                    for line in cache.read_text().splitlines():
+                        item = json.loads(line)
+                        if item['fingerprint'] != fingerprint or item['hs'] != hs or item['series'] not in ids:
+                            raise ValueError('Invalid per-fit checkpoint')
+                        fitted_by_id[item['series']] = item['predictions']
+                pending = [task for task in tasks if task[0] not in fitted_by_id]
+                print(f'{origin:%Y-%m} {variant}: {len(fitted_by_id)}/{len(ids)} cached; start {len(pending)} fits', flush=True)
+                executor = ProcessPoolExecutor(args.workers) if args.workers > 1 else None
+                try:
+                    results = executor.map(fit_prophet, pending, chunksize=1) if executor else map(fit_prophet, pending)
+                    with cache.open('a') as stream:
+                        for series, values in results:
+                            values = np.asarray(values).tolist()
+                            stream.write(json.dumps({'fingerprint':fingerprint,'series':series,'hs':hs,'predictions':values})+'\n')
+                            stream.flush()
+                            fitted_by_id[series] = values
+                            if len(fitted_by_id) % 10 == 0 or len(fitted_by_id) == len(ids):
+                                print(f'{origin:%Y-%m} {variant}: {len(fitted_by_id)}/{len(ids)}, elapsed {time.monotonic()-started:.0f}s',flush=True)
+                finally:
+                    if executor:
+                        executor.shutdown(wait=True, cancel_futures=True)
+                fitted = list(fitted_by_id.items())
                 mapping = {(i,h):float(v) for i,preds in fitted for h,v in zip(hs,preds)}
                 block['pred_prophet_'+variant] = [mapping[i,h] for i,h in zip(block.series,block.h)]
         frames.append(block)

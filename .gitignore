@@ -41,3 +41,6 @@ outputs/research/signals_2024_12.csv
 # Reproducible per-origin Prophet predictions; retain only aggregate results.
 outputs/contest_prophet/**/pairs_*.csv.gz
 outputs/contest_prophet_all/**/pairs_*.csv.gz
+
+outputs/ci_*/
+outputs/**/fits_*.jsonl
