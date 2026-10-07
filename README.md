@@ -1,64 +1,22 @@
-# SberIndex Forecasting — final submission
+<img src="https://github.com/tenzerka2/SberIndex-Forecasting/blob/codex/forecasting-audit-improvements/docs/assets/dark-aura.png?raw=true" width="1200" height="160" alt="Тёмный зелёно-синий градиент — обложка проекта">
 
-Прогноз безналичных потребительских расходов 2 016 муниципальных образований, structural-shift detection и исследование внешних сигналов.
+# SberIndex Forecasting
+### Прогнозирование потребления и обнаружение локальных изменений
 
-## Главный результат
+Конкурсный исследовательский проект на данных СберИндекса. **2 016 муниципалитетов · 73 региона · 24 месяца наблюдений.**
 
-- V3 exact MAE: **719.87 ₽**
-- R² growth: **0.4376**
-- wMAPE: **2.284%**
-- V3 лучше V2 во всех 5 категориальных панелях, не использованных при выборе модели
-- detection structural shifts: PR-AUC **0.383** при base rate 1.82%, median delay 1 месяц
+## Актуальная версия для проверяющих
 
-## Что дополнительно проверено
+**[Открыть решение, результаты и инструкции →](https://github.com/tenzerka2/SberIndex-Forecasting/tree/codex/forecasting-audit-improvements)**
 
-- horizons **1 / 3 / 6 / 12**
-- **TimesFM 2.5-200M** zero-shot
-- Prophet sample benchmark
-- 5 category panels
-- national / weekly SberIndex signals
-- historical news/events: **95 pre-registered queries, 550 articles**
-- conformal intervals
-- deterministic stable / shift / failure municipality examples
-- time-safety / leakage tests
+Полный актуальный комплект от 7 октября 2026 года находится в ветке `codex/forecasting-audit-improvements`. Файлы ниже на этой ветке `main` относятся к предыдущей версии; для проверки и скачивания используйте ссылку выше.
 
-Новости и TimesFM не улучшают point forecast V3; отрицательные результаты сохранены в ablation и используются в выводах.
+[Итоговый отчёт](https://github.com/tenzerka2/SberIndex-Forecasting/blob/codex/forecasting-audit-improvements/SUBMISSION_CURRENT.md) · [Сравнение с Prophet](https://github.com/tenzerka2/SberIndex-Forecasting/blob/codex/forecasting-audit-improvements/FULL_PROPHET_RESULTS.md) · [TimesFM и интервалы](https://github.com/tenzerka2/SberIndex-Forecasting/blob/codex/forecasting-audit-improvements/TIMESFM_RESULTS.md) · [Материалы для презентации](https://github.com/tenzerka2/SberIndex-Forecasting/blob/codex/forecasting-audit-improvements/PRESENTATION_MATERIALS_CURRENT.md)
 
-## Документы подачи
+## Основной результат
 
-- FINAL_REPORT.md — полный отчёт
-- METHOD.md — методология
-- PRESENTATION.md — финальные 10 слайдов + appendix
-- PRESENTATION_DATA.md — source map каждой цифры
-- JURY_QA.md — 25 вопросов жюри
-- RUBRIC_CHECKLIST.md — критерий → доказательство
-- REAL_EXAMPLES.md — реальные примеры МО
-- FINAL_SUBMISSION_STATUS.md — что отправлять
+На горизонтах 1, 3 и 6 месяцев V3 Hedge снизила MAE на **32,36–42,82%** относительно лучших из протестированных вариантов Prophet и на **19,11–30,16%** относительно TimesFM с годовым преобразованием. Сравнение проведено на одинаковых прогнозных парах.
 
-## Воспроизведение
+Это ретроспективная исследовательская оценка, не закрытый тест организаторов. Надёжное предсказание шоков заранее пока не подтверждено. Метод, протоколы, воспроизводимые расчёты и ограничения раскрыты в актуальном комплекте.
 
-```bash
-python -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-# распаковать 5 CSV СберИндекса в data/raw/
-./reproduce.sh
-```
-
-reproduce.sh пересчитывает собственные forecasting results, horizon benchmark, category replication, early warning, news ablation, real examples и figures. Prophet / TimesFM могут использовать frozen cached predictions; отдельный refit описан в benchmark scripts.
-
-## Основные файлы
-
-- src/sbx/data.py — reconstruction 2 016 series
-- src/sbx/models.py / final.py — V2, V3, V3-hedge
-- src/sbx/intervals.py — time-safe conformal
-- src/sbx/early_warning.py / ew_features.py — shifts / detectors
-- src/sbx/news_global.py — verified publication-time news features
-- benchmarks/horizons_benchmark.py — 1/3/6/12
-- benchmarks/foundation_timesfm.py — TimesFM
-- benchmarks/news_ablation_global.py — no-news vs news
-- benchmarks/real_examples.py — deterministic examples
-- tests/test_time_safety.py
-- tests/test_news_time_safety.py
-
-Исходные муниципальные CSV не коммитятся. Стабильного id МО в экспорте нет; технический ключ полного ряда — run_id raw export.
+Проект является самостоятельной конкурсной работой на данных СберИндекса.
