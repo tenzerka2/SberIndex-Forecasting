@@ -37,3 +37,7 @@ outputs/research/*pairs*.csv.gz
 outputs/research/forecast_*_2025.csv.gz
 outputs/research/*_by_origin.csv
 outputs/research/signals_2024_12.csv
+
+# Reproducible per-origin Prophet predictions; retain only aggregate results.
+outputs/contest_prophet/**/pairs_*.csv.gz
+outputs/contest_prophet_all/**/pairs_*.csv.gz

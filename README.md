@@ -1,3 +1,5 @@
+> Новый протокол сравнения с Prophet на 1/3/6/12 месяцев: [инструкция и фактический статус](PROPHET_COMPARISON.md), [Colab-ноутбук](notebooks/contest_prophet.ipynb). Prophet ещё не запускался в текущей среде; опубликованы отдельно результаты без него.
+
 # SberIndex Forecasting — проверка и улучшения 7 октября 2026
 
 Актуальный отчёт: [IMPROVEMENT_REPORT.md](IMPROVEMENT_REPORT.md). Исходная V3 воспроизведена на пяти CSV: MAE **719.87 ₽** на окне exact.
